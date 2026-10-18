@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     # Temporary: project ratified results to interim frontend shape on GET /result.
     # Person 1 should remap apps/web then set FORMCHECK_INTERIM_RESULT_SHIM=0.
     interim_result_shim: bool = True
+    retention_sweep_interval_seconds: int = 300
 
     @property
     def cors_origin_list(self) -> list[str]:

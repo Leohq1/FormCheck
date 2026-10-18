@@ -30,3 +30,16 @@ def get_analysis_for_token(
     if analysis is None or analysis.deleted_at is not None or not tokens_match(token, analysis.token_hash):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
     return analysis
+
+
+def get_analysis_for_token_including_deleted(
+    analysis_id: uuid.UUID,
+    authorization: str | None = Header(default=None),
+    db: Session = Depends(get_db),
+) -> Analysis:
+    """Like get_analysis_for_token but allows already-deleted rows (idempotent DELETE)."""
+    token = extract_bearer(authorization)
+    analysis = db.get(Analysis, analysis_id)
+    if analysis is None or not tokens_match(token, analysis.token_hash):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Not found")
+    return analysis

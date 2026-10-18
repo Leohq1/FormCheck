@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import time
 import uuid
 from datetime import datetime, timezone
@@ -209,6 +210,52 @@ def run_fake_analysis(job: dict[str, Any]) -> None:
 
 
 @dramatiq.actor(max_retries=3)
+def sweep_expired_analyses() -> None:
+    """Mark expired analyses and enqueue deletion of their objects."""
+    settings = get_settings()
+    db = SessionLocal()
+    try:
+        now = datetime.now(timezone.utc)
+        rows = (
+            db.query(Analysis)
+            .filter(
+                Analysis.expires_at < now,
+                Analysis.deleted_at.is_(None),
+                Analysis.status.notin_(["deleted"]),
+            )
+            .limit(100)
+            .all()
+        )
+        for analysis in rows:
+            if analysis.status != "expired":
+                analysis.status = "expired"
+                analysis.stage = "expired"
+                analysis.message_key = "expired"
+                analysis.updated_at = now
+            analysis.deleted_at = now
+            analysis.status = "deleted"
+            analysis.stage = "deleted"
+            analysis.message_key = "deleted"
+            analysis.result_json = None
+            db.add(
+                DeletionOutbox(
+                    analysis_id=analysis.id,
+                    object_key=analysis.source_object_key,
+                )
+            )
+            process_deletion.send(str(analysis.id))
+        if rows:
+            db.commit()
+            logger.info("Retention sweeper deleted %s expired analyses", len(rows))
+    finally:
+        db.close()
+
+    # Self-reschedule (Dramatiq delay in ms).
+    delay_ms = max(60_000, settings.retention_sweep_interval_seconds * 1000)
+    sweep_expired_analyses.send_with_options(delay=delay_ms)
+
+
+@dramatiq.actor(max_retries=3)
 def process_deletion(analysis_id: str) -> None:
     db = SessionLocal()
     storage = ObjectStorage()
@@ -231,3 +278,10 @@ def process_deletion(analysis_id: str) -> None:
         db.commit()
     finally:
         db.close()
+
+
+if os.environ.get("FORMCHECK_START_SWEEPER") == "1":
+    try:
+        sweep_expired_analyses.send()
+    except Exception:
+        logger.debug("Retention sweeper not enqueued yet", exc_info=True)

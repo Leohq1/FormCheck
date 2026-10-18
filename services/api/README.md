@@ -9,11 +9,16 @@ Implementation lives in the shared package `services/formcheck/` (FastAPI app: `
 ```http
 POST   /api/v1/analyses
 POST   /api/v1/analyses/{id}/complete-upload
+POST   /api/v1/analyses/{id}/cancel
 GET    /api/v1/analyses/{id}
 GET    /api/v1/analyses/{id}/result
 DELETE /api/v1/analyses/{id}
 GET    /api/v1/health
 ```
+
+Optional `Idempotency-Key` header on `POST /analyses` and `DELETE /analyses/{id}` (same key + different body → 409).
+
+Schema migrations: from `services/`, `alembic upgrade head` (API startup also runs migrations, with `create_all` fallback).
 
 Create/upload request aliases still match the frontend (`consent`, `byte_size`, flat `upload_url`).
 

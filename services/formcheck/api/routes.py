@@ -6,11 +6,12 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Response, status
+from fastapi.responses import JSONResponse
 from jsonschema import ValidationError
 from sqlalchemy.orm import Session
 
-from formcheck.api.deps import get_analysis_for_token
+from formcheck.api.deps import get_analysis_for_token, get_analysis_for_token_including_deleted
 from formcheck.auth import generate_capability_token, hash_capability_token
 from formcheck.compat import to_interim_result
 from formcheck.config import get_settings
@@ -19,6 +20,7 @@ from formcheck.contract_validate import (
     validate_analysis_result,
 )
 from formcheck.db import get_db
+from formcheck.idempotency import hash_request_body, lookup_idempotency, store_idempotency
 from formcheck.models import Analysis, AuditEvent, DeletionOutbox
 from formcheck.schemas import (
     RESULT_READY_STATUSES,
@@ -98,9 +100,19 @@ def _build_job(analysis: Analysis) -> dict[str, Any]:
 
 
 @router.post("/analyses", response_model=CreateAnalysisResponse, status_code=status.HTTP_201_CREATED)
-def create_analysis(body: CreateAnalysisRequest, db: Session = Depends(get_db)) -> CreateAnalysisResponse:
+def create_analysis(
+    body: CreateAnalysisRequest,
+    db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+) -> CreateAnalysisResponse | JSONResponse:
     _validate_create(body)
     settings = get_settings()
+    route = "POST /api/v1/analyses"
+    req_hash = hash_request_body(body.model_dump())
+    cached = lookup_idempotency(db, key=idempotency_key, route=route, request_hash=req_hash)
+    if cached is not None and cached.response_body is not None:
+        return JSONResponse(status_code=cached.response_status, content=cached.response_body)
+
     storage = ObjectStorage(settings)
 
     analysis_id = uuid.uuid4()
@@ -133,16 +145,25 @@ def create_analysis(body: CreateAnalysisRequest, db: Session = Depends(get_db)) 
         expires_at=expires_at,
     )
     db.add(analysis)
-    _audit(db, analysis_id, "analysis.created", correlation_id, {"stroke": body.stroke})
-    db.commit()
-
-    return CreateAnalysisResponse(
+    response = CreateAnalysisResponse(
         schema_version=settings.schema_version,
         analysis_id=str(analysis_id),
         capability_token=token,
         upload_url=upload_url,
         status="created",
     )
+    store_idempotency(
+        db,
+        key=idempotency_key,
+        route=route,
+        request_hash=req_hash,
+        response_status=201,
+        response_body=response.model_dump(),
+        analysis_id=analysis_id,
+    )
+    _audit(db, analysis_id, "analysis.created", correlation_id, {"stroke": body.stroke})
+    db.commit()
+    return response
 
 
 @router.post(
@@ -261,12 +282,73 @@ def get_result(
     return payload
 
 
-@router.delete("/analyses/{analysis_id}", status_code=status.HTTP_202_ACCEPTED)
-def delete_analysis(
+@router.post(
+    "/analyses/{analysis_id}/cancel",
+    response_model=AnalysisProgress,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+def cancel_analysis(
     analysis: Analysis = Depends(get_analysis_for_token),
     db: Session = Depends(get_db),
+) -> AnalysisProgress:
+    """Cooperative cancel — worker stops between stages; objects retained until delete/expiry."""
+    settings = get_settings()
+    if analysis.status in {"deleted"}:
+        raise HTTPException(status_code=410, detail="Analysis deleted")
+    if analysis.status in {"completed", "inconclusive", "failed", "expired", "cancelled"}:
+        return AnalysisProgress(
+            schema_version=settings.schema_version,
+            analysis_id=str(analysis.id),
+            status=analysis.status,  # type: ignore[arg-type]
+            stage=analysis.stage,
+            progress=analysis.progress,
+            message_key=analysis.message_key,
+            updated_at=_iso(analysis.updated_at) or _iso(_utc_now()) or "",
+            expires_at=_iso(analysis.expires_at),
+        )
+
+    analysis.status = "cancelled"
+    analysis.stage = "cancelled"
+    analysis.message_key = "cancelled"
+    analysis.updated_at = _utc_now()
+    _audit(db, analysis.id, "analysis.cancelled", analysis.correlation_id)
+    db.commit()
+
+    return AnalysisProgress(
+        schema_version=settings.schema_version,
+        analysis_id=str(analysis.id),
+        status="cancelled",
+        stage="cancelled",
+        progress=analysis.progress,
+        message_key="cancelled",
+        updated_at=_iso(analysis.updated_at) or "",
+        expires_at=_iso(analysis.expires_at),
+    )
+
+
+@router.delete("/analyses/{analysis_id}", status_code=status.HTTP_202_ACCEPTED)
+def delete_analysis(
+    analysis: Analysis = Depends(get_analysis_for_token_including_deleted),
+    db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> Response:
+    route = f"DELETE /api/v1/analyses/{analysis.id}"
+    req_hash = hash_request_body({"analysis_id": str(analysis.id)})
+    cached = lookup_idempotency(db, key=idempotency_key, route=route, request_hash=req_hash)
+    if cached is not None:
+        return Response(status_code=cached.response_status)
+
     if analysis.deleted_at is not None or analysis.status == "deleted":
+        store_idempotency(
+            db,
+            key=idempotency_key,
+            route=route,
+            request_hash=req_hash,
+            response_status=202,
+            response_body=None,
+            analysis_id=analysis.id,
+        )
+        db.commit()
         return Response(status_code=status.HTTP_202_ACCEPTED)
 
     analysis.status = "deleted"
@@ -279,6 +361,15 @@ def delete_analysis(
             analysis_id=analysis.id,
             object_key=analysis.source_object_key,
         )
+    )
+    store_idempotency(
+        db,
+        key=idempotency_key,
+        route=route,
+        request_hash=req_hash,
+        response_status=202,
+        response_body=None,
+        analysis_id=analysis.id,
     )
     _audit(db, analysis.id, "analysis.deleted", analysis.correlation_id)
     db.commit()

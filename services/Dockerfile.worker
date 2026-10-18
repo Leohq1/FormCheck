@@ -9,4 +9,5 @@ COPY packages/contracts /contracts
 
 ENV PYTHONPATH=/app
 ENV FORMCHECK_CONTRACTS_DIR=/contracts
+ENV FORMCHECK_START_SWEEPER=1
 CMD ["dramatiq", "formcheck.worker.tasks", "--processes", "1", "--threads", "2"]
