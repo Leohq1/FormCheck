@@ -4,7 +4,7 @@ Owner: Person 4. This package turns structured technique findings into short coa
 
 The slice that is implemented now runs without Person 1, Person 2, Person 3, Docker, or a hosted model. It loads a rights manifest, chunks text on headings, retrieves approved passages with metadata filters and keyword overlap, and writes a deterministic template response. A citation check rejects tips that invent a finding or cite a chunk that was not retrieved.
 
-The coaching text in `tests/fixtures/` is synthetic. It is not a real coaching authority. Do not commit copyrighted manuals.
+The coaching text in `tests/fixtures/` is synthetic. It is not a real coaching authority. Approved coaching text lives in `corpus/documents/` and is loaded from `corpus/manifests/sources.json`. Do not commit copyrighted manuals.
 
 ## Agreement with Person 3
 
@@ -39,6 +39,7 @@ What the tests check:
 - A source without a license is rejected.
 - Heading sections stay separate, and a long section splits below the word budget.
 - Retrieval returns only approved overhead-clear passages and skips a different stroke.
+- The CC BY-SA corpus returns an extended-arm clear passage for `clear.low_arm_extension.v1` and does not return smash, drop, or high-serve text. Rejected sources stay out of the index.
 - Template feedback cites a retrieved chunk, keeps the supplied finding, and preserves severity.
 - An invented citation or an invented finding fails validation.
 - If nothing was retrieved, the result has no practice tip and says that no approved passage was available.
@@ -46,7 +47,7 @@ What the tests check:
 ## Still to build
 
 1. Agree the shared `AnalysisFindings` and feedback schemas in `packages/contracts/` with both groups. This package currently uses its own Pydantic models.
-2. Replace the synthetic fixture corpus with 5–10 rights-approved sources recorded in `corpus/manifests/`. Keep the source files out of git unless their license allows it.
+2. Add more rights-approved sources beside the seven CC BY-SA 4.0 KNSU passages already recorded in `corpus/manifests/sources.json`. Keep source files out of git unless their license allows them.
 3. Store embeddings from OpenAI `text-embedding-3-small` in the local pgvector database. The database is started from `infra/local`. The embedding column is `vector(1536)` and is empty until an API key is available.
 4. Add vector search on top of the same metadata filters, then combine it with keyword ranking. Keep returning 3–6 chunks.
 5. Add the hosted generator adapter for GPT-6 Luna: timeouts, limited retries, structured-output validation, and token-cost logging. Keep this template generator as the fallback when the provider fails.

@@ -5,7 +5,14 @@ from formcheck_rag.findings import AnalysisFindings, Finding
 
 PROMPT_VERSION = "1"
 TEMPLATE_MODEL = "template-fallback"
-_SEVERITY_RANK = {"high": 3, "moderate": 2, "low": 1}
+_SEVERITY_RANK = {
+    "high": 3,
+    "major": 3,
+    "moderate": 2,
+    "medium": 2,
+    "low": 1,
+    "minor": 1,
+}
 _INCONCLUSIVE_WARNINGS = {
     "unsupported_view",
     "low_pose_confidence",

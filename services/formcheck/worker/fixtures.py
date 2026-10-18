@@ -155,6 +155,37 @@ def inconclusive_result(
     }
 
 
+def unanalyzed_stroke_result(
+    analysis_id: str,
+    expires_at: datetime,
+    *,
+    correlation_id: str,
+    stroke: str,
+    pipeline_version: str = "2026.10.0",
+) -> dict[str, Any]:
+    payload = inconclusive_result(
+        analysis_id,
+        expires_at,
+        correlation_id=correlation_id,
+        pipeline_version=pipeline_version,
+    )
+    payload["stroke"] = {
+        "type": stroke,
+        "start_time_ms": None,
+        "end_time_ms": None,
+        "contact_time_ms": None,
+        "confidence": None,
+    }
+    payload["error"] = {
+        "code": "STROKE_NOT_CALIBRATED",
+        "safe_message": "Only the overhead clear has a calibrated analysis path.",
+        "retryable": False,
+        "remediation": ["Upload one overhead clear, or wait until smash and drop rules are calibrated."],
+        "correlation_id": correlation_id,
+    }
+    return payload
+
+
 def failed_result(
     analysis_id: str,
     expires_at: datetime,

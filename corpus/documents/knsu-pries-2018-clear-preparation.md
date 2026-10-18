@@ -1,0 +1,7 @@
+# Forehand overhead clear preparation and follow-through
+
+Cathérine Pries and Marius Winkler, "Lernzirkel Badminton: Hoher Aufschlag / Vorhand-Überkopf-Clear" (2018), KNSU, Institut für Sportwissenschaft, Universität Koblenz-Landau, Campus Koblenz. https://files.knsu.de/spielsportarten/badminton/grundschlaege/ui_lernzirkel_badminton_hoher_aufschlag_vorhand_ueberkopf_clear/ui_lernzirkel_badminton_hoher_aufschlag_vorhand_ueberkopf_clear.pdf Licensed CC BY-SA 4.0. English translation of the clear preparation, loop, and follow-through cues.
+
+Wait with the racket held in front and a loose ready posture. Use a split stance with the non-racket foot forward. Raise the non-racket arm toward the shuttle so the hand sights it. The racket elbow is the lowest point of a diagonal axis running from the non-racket arm across the racket shoulder to the racket elbow. Take the racket shoulder back and bring the hip forward to create preload, with the weight on the back foot.
+
+Start the hitting phase by rotating the racket-side hip and shoulder into the hitting direction, raising the racket elbow to about head height, and cocking the wrist back. In the backswing, take the racket far back over the head, as if it sat in a backpack. Keep watching the shuttle. Swing the racket through to the hip. Accelerate the shuttle so it travels high and deep into the opponent's court. Prepare the shot, stay side-on to the shuttle, and form a roof. After contact, the rotation continues and the racket swings out downward on the non-racket side.

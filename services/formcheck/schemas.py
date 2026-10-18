@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-StrokeId = Literal["overhead_clear"]
+StrokeId = Literal["overhead_clear", "smash", "drop"]
 Handedness = Literal["left", "right"]
 ViewHint = Literal["side", "rear_three_quarter"]
 FindingSeverity = Literal["minor", "moderate", "major"]
@@ -64,6 +64,14 @@ class CreateAnalysisRequest(BaseModel):
     filename: str = Field(min_length=1, max_length=512)
     content_type: str
     byte_size: int = Field(gt=0)
+
+    @field_validator("stroke", mode="before")
+    @classmethod
+    def accept_frontend_clear_id(cls, value: object) -> object:
+        """The upload form uses clear. Jobs and findings use overhead_clear."""
+        if value == "clear":
+            return "overhead_clear"
+        return value
 
 
 class CreateAnalysisResponse(BaseModel):

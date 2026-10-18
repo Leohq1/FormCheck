@@ -1,6 +1,6 @@
 # Local infrastructure
 
-Owner: Person 2 for the API, Redis, and MinIO stack. The file here now starts only the PostgreSQL database Person 4 needs for coaching retrieval.
+Owner: Person 2 for the API, Redis, and object-storage stack. Person 4's coaching tables are created from `init/` the first time the Postgres volume is empty.
 
 The database image is `pgvector/pgvector:pg16`, which is the official Postgres image with the pgvector extension. The local username, password, and database name are all `formcheck`. This password is for the local container only.
 
@@ -40,4 +40,4 @@ docker compose down -v
 
 The coaching tables are created only the first time the data volume is empty. After `docker compose down -v`, the next `docker compose up -d` creates them again.
 
-Redis, MinIO, the API, and the worker are not in this file yet. Person 2 still owns those services.
+`docker compose up --build` also starts Redis, the S3-compatible store, the API on port 8000, and the worker. The existing volume name is `formcheck-pgvector`, so a database created by the earlier Postgres-only file is reused. Init scripts do not rerun on a volume that already has data.

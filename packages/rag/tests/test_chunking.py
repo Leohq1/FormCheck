@@ -21,6 +21,9 @@ def test_chunks_follow_headings_and_stay_within_the_token_budget():
     assert all(len(chunk.text.split()) <= 540 for chunk in chunks)
     assert all(chunk.review_status == "approved" for chunk in chunks)
     assert all(chunk.corpus_version == "test-1" for chunk in chunks)
+    assert all(chunk.source_version == "synthetic-1" for chunk in chunks)
+    assert all(chunk.page_locator == "fixture" for chunk in chunks)
+    assert all(chunk.body_region_tags == ["dominant_arm", "elbow"] for chunk in chunks)
 
 
 def test_long_section_splits_instead_of_mixing_into_the_next_heading():

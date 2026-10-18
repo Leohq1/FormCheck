@@ -1,0 +1,133 @@
+[
+  {
+    "source_id": "waddell-gowitzke-2000-biomechanics",
+    "title": "Biomechanical principles applied to badminton stroke production",
+    "author": "D. B. Waddell, B. A. Gowitzke",
+    "publisher": "International Symposium on Biomechanics in Sports",
+    "publication_date": "2000",
+    "license": "not-granted",
+    "allowed_use": "Bibliographic record only. The paper does not grant reuse, so its text is not stored or indexed.",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "arm_extension"
+    ],
+    "phase_tags": [],
+    "review_status": "rejected",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "not-stored",
+    "text_file": null,
+    "source_version": "excluded-1",
+    "body_region_tags": [],
+    "audience": "unspecified",
+    "skill_level": "unspecified",
+    "page_locator": "not-stored"
+  },
+  {
+    "source_id": "zhou-imai-ren-clear-task-analysis",
+    "title": "Task analysis of the badminton clear",
+    "author": "Zhou, Imai, Ren",
+    "publisher": "International Journal of Sports Science and Medicine",
+    "publication_date": "unknown",
+    "license": "not-granted",
+    "allowed_use": "Bibliographic record only. No reuse license was found, so the paper text is not stored or indexed.",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "arm_extension"
+    ],
+    "phase_tags": [],
+    "review_status": "rejected",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "not-stored",
+    "text_file": null,
+    "source_version": "excluded-1",
+    "body_region_tags": [],
+    "audience": "unspecified",
+    "skill_level": "unspecified",
+    "page_locator": "not-stored"
+  },
+  {
+    "source_id": "badminton-england-hitting-technique",
+    "title": "Badminton England hitting technique",
+    "author": "Badminton England",
+    "publisher": "Badminton England",
+    "publication_date": "unknown",
+    "license": "not-granted",
+    "allowed_use": "Bibliographic record only. Coaching-body material is not licensed for copying into this corpus.",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "arm_extension"
+    ],
+    "phase_tags": [],
+    "review_status": "rejected",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "not-stored",
+    "text_file": null,
+    "source_version": "excluded-1",
+    "body_region_tags": [],
+    "audience": "unspecified",
+    "skill_level": "unspecified",
+    "page_locator": "not-stored"
+  },
+  {
+    "source_id": "badminton-bible-forehand-clear",
+    "title": "Hitting a full-length forehand clear",
+    "author": "Badminton Bible",
+    "publisher": "Badminton Bible",
+    "publication_date": "unknown",
+    "license": "not-granted",
+    "allowed_use": "Bibliographic record only. Site text is not licensed for copying into this corpus.",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "contact_reach",
+      "arm_extension"
+    ],
+    "phase_tags": [],
+    "review_status": "rejected",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "not-stored",
+    "text_file": null,
+    "source_version": "excluded-1",
+    "body_region_tags": [],
+    "audience": "unspecified",
+    "skill_level": "unspecified",
+    "page_locator": "not-stored"
+  },
+  {
+    "source_id": "bwf-coach-manual-level-2",
+    "title": "BWF Coach Education Manual Level 2",
+    "author": "Badminton World Federation",
+    "publisher": "Badminton World Federation",
+    "publication_date": "2016",
+    "license": "not-granted",
+    "allowed_use": "Bibliographic record only. The manual is not licensed for copying into this corpus.",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "arm_extension"
+    ],
+    "phase_tags": [],
+    "review_status": "rejected",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "not-stored",
+    "text_file": null,
+    "source_version": "excluded-1",
+    "body_region_tags": [],
+    "audience": "unspecified",
+    "skill_level": "unspecified",
+    "page_locator": "not-stored"
+  }
+]

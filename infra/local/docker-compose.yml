@@ -4,12 +4,12 @@ services:
   postgres:
     image: pgvector/pgvector:pg16
     container_name: formcheck-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-formcheck}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-formcheck}
+      POSTGRES_DB: ${POSTGRES_DB:-formcheck}
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_USER: formcheck
-      POSTGRES_PASSWORD: formcheck
-      POSTGRES_DB: formcheck
     volumes:
       - formcheck-pgvector:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d:ro
@@ -19,5 +19,101 @@ services:
       timeout: 5s
       retries: 12
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Official minio/minio and minio/mc were removed from Docker Hub (Sep 2026).
+  # pgsty/silo + pgsty/mc are public S3/MinIO-compatible drop-ins for local dev.
+  minio:
+    image: pgsty/silo:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-formcheck}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-formchecksecret}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio-init:
+    image: pgsty/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 formcheck formchecksecret &&
+      mc mb --ignore-existing local/formcheck &&
+      mc anonymous set none local/formcheck
+      "
+
+  api:
+    build:
+      context: ../..
+      dockerfile: services/Dockerfile.api
+    environment:
+      DATABASE_URL: postgresql+psycopg://formcheck:formcheck@postgres:5432/formcheck
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-formcheck}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-formchecksecret}
+      MINIO_BUCKET: ${MINIO_BUCKET:-formcheck}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      CAPABILITY_TOKEN_PEPPER: ${CAPABILITY_TOKEN_PEPPER:-local-dev-pepper-change-me}
+      RETENTION_HOURS: ${RETENTION_HOURS:-24}
+      PIPELINE_VERSION: ${PIPELINE_VERSION:-2026.10.0}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: services/Dockerfile.worker
+    environment:
+      DATABASE_URL: postgresql+psycopg://formcheck:formcheck@postgres:5432/formcheck
+      REDIS_URL: redis://redis:6379/0
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://localhost:9000}
+      MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-formcheck}
+      MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-formchecksecret}
+      MINIO_BUCKET: ${MINIO_BUCKET:-formcheck}
+      CAPABILITY_TOKEN_PEPPER: ${CAPABILITY_TOKEN_PEPPER:-local-dev-pepper-change-me}
+      RETENTION_HOURS: ${RETENTION_HOURS:-24}
+      PIPELINE_VERSION: ${PIPELINE_VERSION:-2026.10.0}
+      FAKE_WORKER_STAGE_MS: ${FAKE_WORKER_STAGE_MS:-400}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      api:
+        condition: service_started
+
 volumes:
   formcheck-pgvector:
+  minio-data:

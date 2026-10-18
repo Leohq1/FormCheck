@@ -6,8 +6,11 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY services/formcheck /app/formcheck
 COPY packages/contracts /contracts
+COPY packages/rag/src/formcheck_rag /app/formcheck_rag
+COPY corpus /app/corpus
 
 ENV PYTHONPATH=/app
 ENV FORMCHECK_CONTRACTS_DIR=/contracts
+ENV FORMCHECK_CORPUS_MANIFEST=/app/corpus/manifests/sources.json
 ENV FORMCHECK_START_SWEEPER=1
 CMD ["dramatiq", "formcheck.worker.tasks", "--processes", "1", "--threads", "2"]

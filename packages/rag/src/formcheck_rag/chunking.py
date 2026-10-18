@@ -12,9 +12,14 @@ class Chunk(BaseModel):
     source_id: str
     text: str
     locator: str
+    source_version: str
     stroke_tags: list[str]
     fault_tags: list[str]
     phase_tags: list[str] = Field(default_factory=list)
+    body_region_tags: list[str]
+    audience: str
+    skill_level: str
+    page_locator: str
     review_status: str
     corpus_version: str
     relevance_score: float = 0.0
@@ -34,9 +39,14 @@ def chunk_document(text: str, source: SourceManifest, corpus_version: str) -> li
                     source_id=source.source_id,
                     text=cleaned,
                     locator=locator,
+                    source_version=source.source_version,
                     stroke_tags=list(source.stroke_tags),
                     fault_tags=list(source.fault_tags),
                     phase_tags=list(source.phase_tags),
+                    body_region_tags=list(source.body_region_tags),
+                    audience=source.audience,
+                    skill_level=source.skill_level,
+                    page_locator=source.page_locator,
                     review_status=source.review_status,
                     corpus_version=corpus_version,
                 )

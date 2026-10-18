@@ -164,11 +164,26 @@ def run_fake_analysis(job: dict[str, Any]) -> None:
                 pipeline_version=pipeline,
             )
             _persist_result(db, analysis, result, status="failed")
-        else:
-            result = completed_result(
+        elif parsed.stroke in {"smash", "drop"}:
+            from formcheck.worker.fixtures import unanalyzed_stroke_result
+
+            result = unanalyzed_stroke_result(
                 str(analysis.id),
                 analysis.expires_at,
+                correlation_id=analysis.correlation_id,
+                stroke=parsed.stroke,
                 pipeline_version=pipeline,
+            )
+            _persist_result(db, analysis, result, status="inconclusive")
+        else:
+            from formcheck.worker.coaching import apply_coaching
+
+            result = apply_coaching(
+                completed_result(
+                    str(analysis.id),
+                    analysis.expires_at,
+                    pipeline_version=pipeline,
+                )
             )
             _persist_result(db, analysis, result, status="completed")
     except ValidationError as exc:
