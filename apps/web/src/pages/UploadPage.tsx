@@ -1,9 +1,13 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { getAnalysisApi } from '@/api'
 import { storeCapabilityToken } from '@/api/session'
 import GlideSelect from '@/components/GlideSelect'
+import SpecularButton, {
+  specularGhostDarkProps,
+  specularPrimaryProps,
+} from '@/components/SpecularButton'
 import { VideoDropzone } from '@/components/VideoDropzone'
 import { storeAnalysisClip } from '@/lib/clipSession'
 import { validateVideoFile } from '@/lib/videoValidation'
@@ -209,16 +213,19 @@ export function UploadPage() {
           ) : null}
 
           <div className="flex flex-wrap items-center gap-3">
-            <button
+            <SpecularButton
               type="submit"
               disabled={uploadMutation.isPending}
-              className="btn-primary"
+              {...specularPrimaryProps}
             >
               {uploadMutation.isPending ? 'Uploading…' : 'Analyze clip'}
-            </button>
-            <Link to="/#recording-tips" className="btn-ghost">
+            </SpecularButton>
+            <SpecularButton
+              to="/#recording-tips"
+              {...specularGhostDarkProps}
+            >
               Review recording tips
-            </Link>
+            </SpecularButton>
           </div>
         </form>
 

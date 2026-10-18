@@ -23,29 +23,20 @@ export function AppShell() {
           <FloatingLines
             className="h-full min-h-[100svh] w-full"
             style={{ width: '100%', height: '100%', minHeight: '100svh' }}
-            linesGradient={['#ae3121', '#f0e4e1', '#ffffff']}
+            linesGradient={['#ffffff', '#ffffff']}
             enabledWaves={['top', 'middle', 'bottom']}
-            lineCount={[8, 10, 8]}
-            lineDistance={[5, 5, 6]}
-            lineWidth={2.5}
-            lineStyle="solid"
-            glow={1.35}
-            brightness={1.25}
-            animationSpeed={0.65}
-            amplitude={0.95}
-            depthOfField={0.4}
-            edgeFade={0.22}
+            lineCount={13}
+            lineDistance={30}
+            bendStrength={-0.6}
             interactive
-            bendRadius={5}
-            bendStrength={-0.5}
-            parallax
-            parallaxStrength={0.18}
             clickSwirl
-            intro
-            lightMode={false}
-            opacity={1}
-            backgroundColor="#242e2d"
-            mixBlendMode="normal"
+            lineWidth={4}
+            glow={3}
+            brightness={2}
+            animationSpeed={0.8}
+            amplitude={1.9}
+            depthOfField={1}
+            parallaxStrength={0.25}
           />
         </div>
       ) : null}
