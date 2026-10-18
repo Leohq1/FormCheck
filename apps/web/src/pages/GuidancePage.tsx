@@ -1,32 +1,57 @@
 import { Link } from 'react-router-dom'
+import GridMotion from '@/components/GridMotion'
 import { TipsList } from '@/components/TipsList'
 import { RECORDING_TIPS } from '@/sports/config'
+
+/** Local heroes + Unsplash competitive badminton action shots. */
+const GRID_ITEMS = [
+  '/images/hero-badminton.jpg',
+  '/images/hero-court.jpg',
+  'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1722087642932-9b070e9a066e?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1599391398131-cd12dfc6c24e?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1595220427358-8cf2ce3d7f89?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1729166241032-5b339506a0d7?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1733141731875-8e33d5f2bd36?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1720515226352-b0b1dec6813b?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1758798474157-99bd084de57f?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1633313236093-beebdd1a5e80?w=640&q=75&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?w=640&q=75&auto=format&fit=crop',
+]
 
 export function GuidancePage() {
   return (
     <div>
       <section className="relative flex min-h-[100svh] items-end overflow-hidden bg-[var(--color-ink)]">
-        <img
-          src="/images/hero-badminton.jpg"
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover"
-          fetchPriority="high"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-r from-[var(--color-ink)]/90 via-[var(--color-ink)]/70 to-[var(--color-ink)]/35"
-          aria-hidden="true"
-        />
-        <div
-          className="absolute inset-0 bg-gradient-to-t from-[var(--color-ink)]/80 via-transparent to-[var(--color-ink)]/40"
-          aria-hidden="true"
-        />
+        <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+          <GridMotion
+            items={GRID_ITEMS}
+            rows={4}
+            aspectRatio={1.33}
+            gap={14}
+            radius={12}
+            angle={-10}
+            tilt={0}
+            speed={22}
+            direction="alternate"
+            parallax={0.45}
+            spotlight={0.55}
+            dim={0.45}
+            fade={0.55}
+            grayscale={false}
+            theme="dark"
+            tileColor="#242e2d"
+          />
+        </div>
 
-        <p
-          className="pointer-events-none absolute bottom-[-0.08em] left-0 right-0 select-none text-center font-[family-name:var(--font-display)] text-[clamp(4.5rem,22vw,14rem)] font-semibold leading-none tracking-tight text-white/[0.07]"
+        <div
+          className="absolute inset-0 z-[1] bg-gradient-to-r from-[var(--color-ink)]/88 via-[var(--color-ink)]/55 to-[var(--color-ink)]/30"
           aria-hidden="true"
-        >
-          CLEAR
-        </p>
+        />
+        <div
+          className="absolute inset-0 z-[1] bg-gradient-to-t from-[var(--color-ink)]/85 via-transparent to-[var(--color-ink)]/45"
+          aria-hidden="true"
+        />
 
         <div className="relative z-10 w-full px-5 pb-16 pt-28 sm:px-8 sm:pb-20">
           <div className="mx-auto max-w-3xl space-y-5">
