@@ -8,6 +8,11 @@ import {
 } from '@/api/session'
 import { isTerminalStatus, type AnalysisStatus } from '@/api/types'
 import { ResultsPanel } from '@/components/ResultsPanel'
+import SpecularButton, {
+  specularDangerProps,
+  specularGhostLightProps,
+  specularPrimaryProps,
+} from '@/components/SpecularButton'
 import { StatusBanner } from '@/components/StatusBanner'
 import { clearAnalysisClip, getAnalysisClip } from '@/lib/clipSession'
 
@@ -70,9 +75,9 @@ export function AnalysisPage() {
           This browser no longer has access to this analysis. Upload again to
           continue.
         </StatusBanner>
-        <Link to="/upload" className="btn-primary">
+        <SpecularButton to="/upload" {...specularPrimaryProps}>
           Go to upload
-        </Link>
+        </SpecularButton>
       </div>
     )
   }
@@ -83,9 +88,9 @@ export function AnalysisPage() {
         <StatusBanner tone="neutral" title="Analysis deleted">
           Your video and results for this analysis have been removed.
         </StatusBanner>
-        <Link to="/upload" className="btn-primary">
+        <SpecularButton to="/upload" {...specularPrimaryProps}>
           Analyze another clip
-        </Link>
+        </SpecularButton>
       </div>
     )
   }
@@ -196,9 +201,9 @@ export function AnalysisPage() {
               </ul>
             </div>
           ) : null}
-          <Link to="/upload" className="btn-primary">
+          <SpecularButton to="/upload" {...specularPrimaryProps}>
             Try another recording
-          </Link>
+          </SpecularButton>
         </div>
       ) : null}
 
@@ -222,9 +227,9 @@ export function AnalysisPage() {
               Support ID: {result.error.correlation_id}
             </p>
           </StatusBanner>
-          <Link to="/upload" className="btn-primary">
+          <SpecularButton to="/upload" {...specularPrimaryProps}>
             Upload again
-          </Link>
+          </SpecularButton>
         </div>
       ) : null}
 
@@ -234,9 +239,9 @@ export function AnalysisPage() {
             {result.error?.safe_message ??
               'Results are removed after 24 hours. Upload a new clip to continue.'}
           </StatusBanner>
-          <Link to="/upload" className="btn-primary">
+          <SpecularButton to="/upload" {...specularPrimaryProps}>
             Start a new analysis
-          </Link>
+          </SpecularButton>
         </div>
       ) : null}
 
@@ -303,13 +308,13 @@ function DeleteControls({
 }) {
   if (!confirmDelete) {
     return (
-      <button
+      <SpecularButton
         type="button"
-        className="btn-primary"
         onClick={() => setConfirmDelete(true)}
+        {...specularPrimaryProps}
       >
         Delete this analysis
-      </button>
+      </SpecularButton>
     )
   }
 
@@ -323,22 +328,22 @@ function DeleteControls({
         Delete this analysis and all related video data? This cannot be undone.
       </p>
       <div className="flex flex-wrap gap-3">
-        <button
+        <SpecularButton
           type="button"
-          className="rounded-sm bg-[var(--color-accent-deep)] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[var(--color-accent)] disabled:opacity-60"
           disabled={isPending}
           onClick={onDelete}
+          {...specularDangerProps}
         >
           {isPending ? 'Deleting…' : 'Confirm delete'}
-        </button>
-        <button
+        </SpecularButton>
+        <SpecularButton
           type="button"
-          className="btn-ghost !py-2"
           disabled={isPending}
           onClick={() => setConfirmDelete(false)}
+          {...specularGhostLightProps}
         >
           Cancel
-        </button>
+        </SpecularButton>
       </div>
     </div>
   )

@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
 import { BiLogoVisualStudio } from 'react-icons/bi'
@@ -24,6 +23,9 @@ import AnimatedContent from '@/components/AnimatedContent'
 import { BrandErrorBoundary } from '@/components/BrandErrorBoundary'
 import GridMotion from '@/components/GridMotion'
 import LogoLoop, { type LogoItem } from '@/components/LogoLoop'
+import SpecularButton, {
+  specularPrimaryProps,
+} from '@/components/SpecularButton'
 import TrueFocus from '@/components/TrueFocus'
 import { RECORDING_TIPS } from '@/sports/config'
 
@@ -228,9 +230,9 @@ export function GuidancePage() {
               notes, drills, and cited coaching guidance.
             </p>
             <div className="pt-2">
-              <Link to="/upload" className="btn-primary">
+              <SpecularButton to="/upload" {...specularPrimaryProps}>
                 Continue to upload
-              </Link>
+              </SpecularButton>
             </div>
           </AnimatedContent>
 
@@ -335,9 +337,9 @@ export function GuidancePage() {
               </div>
 
               <div className="fluid-glass-bento__cta">
-                <Link to="/upload" className="btn-primary">
+                <SpecularButton to="/upload" {...specularPrimaryProps}>
                   Continue to upload
-                </Link>
+                </SpecularButton>
               </div>
             </AnimatedContent>
           </div>
