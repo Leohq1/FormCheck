@@ -76,15 +76,6 @@ class ObjectStorage:
         except ClientError as exc:
             logger.warning("Unable to set MinIO CORS: %s", exc)
 
-    def put_bytes(self, key: str, payload: bytes, content_type: str) -> None:
-        self._internal.put_object(
-            Bucket=self.bucket,
-            Key=key,
-            Body=payload,
-            ContentType=content_type,
-            ContentLength=len(payload),
-        )
-
     def presign_put(self, key: str, content_type: str, expires_in: int | None = None) -> str:
         expires = expires_in or self.settings.upload_url_expires_seconds
         return self._public.generate_presigned_url(

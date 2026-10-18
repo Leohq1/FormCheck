@@ -42,20 +42,15 @@ describe('http client upload', () => {
       content_type: 'video/mp4',
       byte_size: file.size,
     })
-    await api.uploadFile(response.analysis_id, response.capability_token, file, 'video/mp4')
+    await api.uploadFile(response.upload_url, file, 'video/mp4')
     await api.completeUpload(response.analysis_id, response.capability_token)
 
     expect(fetchMock).toHaveBeenCalledTimes(3)
-    expect(fetchMock.mock.calls[1][0]).toBe(
-      `http://api.local/api/v1/analyses/${created.analysis_id}/upload`,
-    )
+    expect(fetchMock.mock.calls[1][0]).toBe('http://storage.local/put')
     expect(fetchMock.mock.calls[1][1]).toMatchObject({
       method: 'PUT',
       body: file,
-      headers: {
-        'Content-Type': 'video/mp4',
-        Authorization: 'Bearer token',
-      },
+      headers: { 'Content-Type': 'video/mp4' },
     })
     expect(String(fetchMock.mock.calls[2][0])).toContain('/complete-upload')
   })
