@@ -64,4 +64,7 @@ def test_asset_backed_run_keeps_public_findings_empty(tmp_path: Path) -> None:
 
 
 def _real_stages(tmp_path: Path, model: Path):
-    pytest.fail("Asset-backed stages are not invoked when requirements are missing.")
+    from formcheck_analysis.stages import build_real_stages
+    from formcheck_biomechanics.models import Handedness, ViewHint
+
+    return build_real_stages(tmp_path, model, Handedness.RIGHT, ViewHint.SIDE)

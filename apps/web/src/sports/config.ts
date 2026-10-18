@@ -47,6 +47,20 @@ export const MVP_SPORT = SPORTS[0]
 export const MVP_STROKE = MVP_SPORT.strokes[0]
 export const STROKE_OPTIONS = MVP_SPORT.strokes
 
+/** Reference swings served from apps/web/public/reference. Drop is a clear until a drop clip exists. */
+export const REFERENCE_CLIPS: Record<StrokeId, string> = {
+  overhead_clear: '/reference/clear.mov',
+  smash: '/reference/smash.mov',
+  drop: '/reference/drop.mov',
+}
+
+export function referenceClipFor(stroke: string): string {
+  if (stroke === 'smash' || stroke === 'drop' || stroke === 'overhead_clear') {
+    return REFERENCE_CLIPS[stroke]
+  }
+  return REFERENCE_CLIPS.overhead_clear
+}
+
 export const VIDEO_CONSTRAINTS = {
   maxSizeBytes: 100 * 1024 * 1024,
   maxDurationSeconds: 30,

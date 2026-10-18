@@ -46,10 +46,11 @@ describe('ResultsPanel', () => {
     cleanup()
   })
 
-  it('says no supported fault was detected when findings are empty', () => {
+  it('says coaching did not come back when there are no tips', () => {
     render(<ResultsPanel result={result()} />)
+    expect(screen.getByText('Practice session')).toBeInTheDocument()
     expect(
-      screen.getByText(/No supported fault detected/i),
+      screen.getByText(/Coaching for this shot did not come back/i),
     ).toBeInTheDocument()
   })
 
@@ -57,10 +58,10 @@ describe('ResultsPanel', () => {
     render(<ResultsPanel result={result()} />)
     expect(screen.getByText('Form comparison')).toBeInTheDocument()
     expect(screen.getByText('Your swing')).toBeInTheDocument()
-    expect(screen.getByText('Reference form')).toBeInTheDocument()
+    expect(screen.getByText('Reference overhead clear')).toBeInTheDocument()
   })
 
-  it('shows ratified tips and structured evidence', () => {
+  it('shows the practice session as three cards', () => {
     render(
       <ResultsPanel
         result={result({
@@ -105,12 +106,10 @@ describe('ResultsPanel', () => {
       />,
     )
 
-    expect(screen.getByText('Coaching suggestions')).toBeInTheDocument()
-    expect(screen.queryByText('What to work on')).not.toBeInTheDocument()
-    expect(screen.getByText('Low arm extension at maximum reach')).toBeInTheDocument()
+    expect(screen.getByText('Practice session')).toBeInTheDocument()
     expect(screen.getByText('Reach through contact')).toBeInTheDocument()
     expect(screen.getByText('Shadow-swing 10 overhead clears.')).toBeInTheDocument()
-    expect(screen.getByText(/dominant_elbow_angle_at_max_wrist_height_deg/)).toBeInTheDocument()
+    expect(screen.queryByText(/dominant_elbow_angle_at_max_wrist_height_deg/)).not.toBeInTheDocument()
     expect(screen.queryByText(/overhead_clear, contact_reach/)).not.toBeInTheDocument()
   })
 })

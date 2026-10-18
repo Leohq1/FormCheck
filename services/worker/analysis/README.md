@@ -18,7 +18,7 @@ FFmpeg and ffprobe are required for real normalization. Synthetic tests do not n
 Optional local assets, never committed:
 
 ```text
-FORMCHECK_SAMPLE_VIDEO=.local/samples/overhead_clear.mp4
+FORMCHECK_SAMPLE_VIDEO=.local/samples/clear/overhead_clear.mov
 MEDIAPIPE_POSE_MODEL_PATH=.local/models/pose_landmarker_full.task
 ```
 

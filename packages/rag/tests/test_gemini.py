@@ -3,7 +3,12 @@ import os
 import pytest
 from formcheck_rag.feedback import TemplateFeedbackGenerator
 from formcheck_rag.findings import AnalysisFindings
-from formcheck_rag.gemini import GeminiConfig, GeminiFeedbackGenerator, gemini_config_from_env
+from formcheck_rag.gemini import (
+    GeminiConfig,
+    GeminiFeedbackGenerator,
+    gemini_config_from_env,
+    parse_gemini_json,
+)
 from test_feedback import _findings, _index
 
 
@@ -58,6 +63,26 @@ def test_valid_model_output_is_kept_when_citations_match(monkeypatch: pytest.Mon
 
     assert feedback.tips[0].finding_id == expected.tips[0].finding_id
     assert transport.calls == 1
+
+
+def test_string_limitations_are_accepted() -> None:
+    findings = _findings()
+    evidence = _index().search_findings(findings)
+    expected = TemplateFeedbackGenerator().generate(findings, evidence)
+    payload = expected.model_dump()
+    payload["limitations"] = "Contact time was estimated."
+    feedback = GeminiFeedbackGenerator(
+        GeminiConfig(api_key="test-key", model="gemini-test", max_attempts=1),
+        transport=_Scripted([payload]),
+    ).generate(findings, evidence)
+
+    assert feedback.limitations == ["Contact time was estimated."]
+    assert feedback.model == "gemini-test"
+
+
+def test_parse_gemini_json_strips_a_markdown_fence() -> None:
+    payload = parse_gemini_json('```json\n{"summary": "Reach up."}\n```')
+    assert payload == {"summary": "Reach up."}
 
 
 def test_env_config_requires_key_and_model(monkeypatch: pytest.MonkeyPatch) -> None:

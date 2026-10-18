@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { STROKE_OPTIONS } from '@/sports/config'
+import { referenceClipFor, STROKE_OPTIONS } from '@/sports/config'
 
 describe('stroke options', () => {
   it('offers overhead clear, smash, and drop', () => {
@@ -8,5 +8,11 @@ describe('stroke options', () => {
       'smash',
       'drop',
     ])
+  })
+
+  it('pairs each upload choice with its reference clip', () => {
+    expect(referenceClipFor('overhead_clear')).toBe('/reference/clear.mov')
+    expect(referenceClipFor('smash')).toBe('/reference/smash.mov')
+    expect(referenceClipFor('drop')).toBe('/reference/drop.mov')
   })
 })

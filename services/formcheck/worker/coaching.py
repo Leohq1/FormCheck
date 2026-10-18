@@ -1,4 +1,4 @@
-"""Person 4 coaching stage. Uses the local corpus and the template generator."""
+"""Person 4 coaching stage. Uses the local corpus and Gemini when configured."""
 
 from __future__ import annotations
 
@@ -6,10 +6,17 @@ import os
 from pathlib import Path
 from typing import Any
 
+from formcheck.worker.projection import PROVISIONAL_LOW_ARM_CUTOFF_DEG
 from formcheck_rag.corpus import CORPUS_VERSION, load_index
 from formcheck_rag.embeddings import LOCAL_EMBEDDING_MODEL
-from formcheck_rag.feedback import TEMPLATE_MODEL, TemplateFeedbackGenerator, validate_feedback
+from formcheck_rag.feedback import TemplateFeedbackGenerator, validate_feedback
 from formcheck_rag.findings import AnalysisFindings
+from formcheck_rag.gemini import (
+    GeminiFeedbackGenerator,
+    UrllibGeminiTransport,
+    gemini_config_from_env,
+    load_local_gemini_env,
+)
 
 
 def apply_coaching(result: dict[str, Any]) -> dict[str, Any]:
@@ -26,16 +33,33 @@ def apply_coaching(result: dict[str, Any]) -> dict[str, Any]:
         }
     )
     evidence = load_index(_manifest()).search_findings(findings)
-    feedback = TemplateFeedbackGenerator().generate(findings, evidence)
+    feedback = _generator().generate(findings, evidence)
     validate_feedback(feedback, findings, evidence)
     updated = dict(result)
-    updated["feedback"] = feedback.model_dump()
+    dumped = feedback.model_dump()
+    note = (
+        f"The {PROVISIONAL_LOW_ARM_CUTOFF_DEG:.0f} degree cutoff is a provisional test "
+        "and is not calibrated."
+    )
+    limitations = [str(item) for item in dumped.get("limitations") or []]
+    if note not in limitations:
+        limitations.append(note)
+    dumped["limitations"] = limitations
+    updated["feedback"] = dumped
     versions = dict(result.get("versions") or {})
     versions["corpus"] = CORPUS_VERSION
     versions["embedding"] = LOCAL_EMBEDDING_MODEL
-    versions["generation"] = TEMPLATE_MODEL
+    versions["generation"] = feedback.model
     updated["versions"] = versions
     return updated
+
+
+def _generator() -> GeminiFeedbackGenerator | TemplateFeedbackGenerator:
+    load_local_gemini_env()
+    config = gemini_config_from_env()
+    if config is None:
+        return TemplateFeedbackGenerator()
+    return GeminiFeedbackGenerator(config, UrllibGeminiTransport(config.api_key))
 
 
 def _manifest() -> Path:

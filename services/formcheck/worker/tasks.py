@@ -1,4 +1,4 @@
-"""Durable fake analysis worker (Person 2 orchestration)."""
+"""Durable analysis worker. Filename fixtures stay scripted; uploaded strokes run the pipeline."""
 
 from __future__ import annotations
 
@@ -25,7 +25,6 @@ from formcheck.schemas import AnalysisJob, AnalysisProgressEvent
 from formcheck.storage import ObjectStorage
 from formcheck.worker import broker as _broker  # noqa: F401 — configures broker
 from formcheck.worker.fixtures import (
-    completed_result,
     expired_result,
     failed_result,
     inconclusive_result,
@@ -46,6 +45,11 @@ PROCESSING_STAGES = [
 
 def _is_cancelled(analysis: Analysis) -> bool:
     return analysis.status in {"cancelled", "deleted"} or analysis.deleted_at is not None
+
+
+def _cancelled_now(db: Any, analysis: Analysis) -> bool:
+    db.refresh(analysis)
+    return _is_cancelled(analysis)
 
 
 def _iso_now() -> str:
@@ -125,22 +129,24 @@ def run_fake_analysis(job: dict[str, Any]) -> None:
                 parsed.video_object_key,
             )
 
-        for stage, message_key in PROCESSING_STAGES:
+        pipeline = parsed.pipeline_version or settings.pipeline_version
+        outcome = outcome_from_filename(analysis.filename)
+        scripted = outcome != "completed"
+        if scripted:
+            for stage, message_key in PROCESSING_STAGES:
+                db.refresh(analysis)
+                if _is_cancelled(analysis):
+                    return
+                _apply_progress(
+                    db, analysis, stage=stage, message_key=message_key, progress=None
+                )
+                time.sleep(stage_ms)
+
             db.refresh(analysis)
             if _is_cancelled(analysis):
                 return
-            _apply_progress(
-                db, analysis, stage=stage, message_key=message_key, progress=None
-            )
-            time.sleep(stage_ms)
 
-        db.refresh(analysis)
-        if _is_cancelled(analysis):
-            return
-
-        pipeline = parsed.pipeline_version or settings.pipeline_version
-        outcome = outcome_from_filename(analysis.filename)
-        if outcome == "expired":
+        if scripted and outcome == "expired":
             result = expired_result(
                 str(analysis.id),
                 analysis.expires_at,
@@ -148,7 +154,7 @@ def run_fake_analysis(job: dict[str, Any]) -> None:
                 pipeline_version=pipeline,
             )
             _persist_result(db, analysis, result, status="expired")
-        elif outcome == "inconclusive":
+        elif scripted and outcome == "inconclusive":
             result = inconclusive_result(
                 str(analysis.id),
                 analysis.expires_at,
@@ -156,7 +162,7 @@ def run_fake_analysis(job: dict[str, Any]) -> None:
                 pipeline_version=pipeline,
             )
             _persist_result(db, analysis, result, status="inconclusive")
-        elif outcome == "failed":
+        elif scripted and outcome == "failed":
             result = failed_result(
                 str(analysis.id),
                 analysis.expires_at,
@@ -164,28 +170,48 @@ def run_fake_analysis(job: dict[str, Any]) -> None:
                 pipeline_version=pipeline,
             )
             _persist_result(db, analysis, result, status="failed")
-        elif parsed.stroke in {"smash", "drop"}:
-            from formcheck.worker.fixtures import unanalyzed_stroke_result
-
-            result = unanalyzed_stroke_result(
-                str(analysis.id),
-                analysis.expires_at,
-                correlation_id=analysis.correlation_id,
-                stroke=parsed.stroke,
-                pipeline_version=pipeline,
-            )
-            _persist_result(db, analysis, result, status="inconclusive")
         else:
-            from formcheck.worker.coaching import apply_coaching
+            from formcheck.worker.live import run_pipeline
+            from formcheck.worker.runtime import AnalysisCancelled, execute_video_analysis
 
-            result = apply_coaching(
-                completed_result(
-                    str(analysis.id),
-                    analysis.expires_at,
+            def on_progress(stage: str, message_key: str | None, progress: float | None) -> None:
+                db.refresh(analysis)
+                if _is_cancelled(analysis):
+                    return
+                _apply_progress(db, analysis, stage=stage, message_key=message_key, progress=progress)
+
+            def runner() -> object:
+                return run_pipeline(
+                    analysis_id=str(analysis.id),
+                    object_key=parsed.video_object_key,
+                    handedness=parsed.handedness,
+                    view_hint=parsed.view_hint,
                     pipeline_version=pipeline,
+                    on_progress=on_progress,
+                    is_cancelled=lambda: _cancelled_now(db, analysis),
                 )
-            )
-            _persist_result(db, analysis, result, status="completed")
+
+            try:
+                result, status = execute_video_analysis(
+                    analysis_id=str(analysis.id),
+                    expires_at=analysis.expires_at,
+                    correlation_id=analysis.correlation_id,
+                    pipeline_version=pipeline,
+                    runner=runner,
+                )
+            except AnalysisCancelled:
+                return
+            if status == "completed":
+                from formcheck.worker.stroke_brief import apply_stroke_brief
+
+                stroke = dict(result.get("stroke") or {})
+                stroke["type"] = parsed.stroke
+                result["stroke"] = stroke
+                result = apply_stroke_brief(result)
+            db.refresh(analysis)
+            if _is_cancelled(analysis):
+                return
+            _persist_result(db, analysis, result, status=status)
     except ValidationError as exc:
         logger.error(
             "Result/progress schema validation failed for %s: %s",

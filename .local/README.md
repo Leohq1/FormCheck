@@ -45,13 +45,13 @@ documented uv workflow so this project-level exclusion is respected.
 
 Only this README is tracked under `.local/`. Recommended asset locations are:
 
-- Sample video: `.local/samples/overhead_clear.mp4`
+- Sample videos: `.local/samples/clear/overhead_clear.mov`, `.local/samples/smash/smash1.mov`, and `.local/samples/drop/overhead_clear.mov` (the drop clip is a clear placeholder)
 - Pose model: `.local/models/pose_landmarker_full.task`
 
 Explicitly provide their paths for asset-dependent tests or development runs:
 
 ```powershell
-$env:FORMCHECK_SAMPLE_VIDEO = (Resolve-Path '.local/samples/overhead_clear.mp4').Path
+$env:FORMCHECK_SAMPLE_VIDEO = (Resolve-Path '.local/samples/clear/overhead_clear.mov').Path
 $env:MEDIAPIPE_POSE_MODEL_PATH = (Resolve-Path '.local/models/pose_landmarker_full.task').Path
 ```
 
@@ -61,9 +61,16 @@ and any redistribution restrictions privately alongside the asset. Do not commit
 videos, frames, extracted pose data, or other participant-derived artifacts.
 
 `MEDIAPIPE_POSE_MODEL_PATH` must identify a separately obtained Pose Landmarker
-model. Check its license and permitted use before downloading or using it. Keep
-the source URL, model name/version, download date, license, and SHA-256 hash in a
-local provenance record. Do not commit model binaries or restricted assets.
+model. The full float16 model used here is Apache-2.0, published by MediaPipe:
+
+`https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task`
+
+Place it at `.local/models/pose_landmarker_full.task`. The copy downloaded on
+2026-10-18 is 9398198 bytes with SHA-256
+`5134a3aad27a58b93da0088d431f366da362b44e3ccfbe3462b3827a839011b1`.
+Do not commit model binaries. Compose mounts `.local/models` into the worker
+at `/models`. FFmpeg and ffprobe must be on the host PATH for local runs; the
+worker image installs them itself.
 
 Assets are never downloaded implicitly. The developer supplies both files and
 explicit paths; missing or invalid paths cause the relevant asset tests to skip

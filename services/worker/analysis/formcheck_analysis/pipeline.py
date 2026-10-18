@@ -86,6 +86,7 @@ class AnalysisPipeline:
         self.stages.normalize(source)
         self._report(job, AnalysisStage.NORMALIZE, "preprocessing_completed")
         self._check(job.analysis_id)
+        self._report(job, AnalysisStage.POSE, "pose_started")
         pose = self.stages.pose(source)
         self._report(job, AnalysisStage.POSE, "pose_estimated")
         quality = self.stages.quality(pose, job.view_hint)

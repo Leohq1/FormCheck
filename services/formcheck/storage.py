@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from pathlib import Path
 from urllib.parse import urlparse
 
 import boto3
@@ -108,6 +109,25 @@ class ObjectStorage:
             content_type=head.get("ContentType"),
             etag=head.get("ETag"),
         )
+
+    def download_file(self, key: str, destination: Path) -> None:
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self._internal.download_file(self.bucket, key, str(destination))
+        except ClientError as exc:
+            code = exc.response.get("Error", {}).get("Code", "")
+            if code in {"404", "NoSuchKey", "NotFound", "404 Not Found"}:
+                raise FileNotFoundError(key) from exc
+            raise
+
+    def upload_file(self, key: str, source: Path, *, content_type: str) -> ObjectStat:
+        self._internal.upload_file(
+            str(source),
+            self.bucket,
+            key,
+            ExtraArgs={"ContentType": content_type},
+        )
+        return self.stat_object(key)
 
     def delete_object(self, key: str) -> None:
         self._internal.delete_object(Bucket=self.bucket, Key=key)

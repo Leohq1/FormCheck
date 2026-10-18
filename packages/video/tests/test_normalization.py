@@ -96,6 +96,7 @@ def test_successful_normalization_replaces_outputs_atomically(tmp_path: Path) ->
     )
 
     assert video_output.read_bytes() == b"normalized"
+    assert result.command[-1].endswith(".mp4")
     assert "normalization.v1" in timestamps.read_text(encoding="utf-8")
     assert result.output_fps == 30
     assert not list(tmp_path.glob("*.partial"))
