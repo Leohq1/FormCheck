@@ -1,0 +1,50 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "019a0000-0000-7000-8000-000000000001",
+  "quality": {
+    "overall": 0.84,
+    "warnings": []
+  },
+  "stroke": {
+    "type": "overhead_clear",
+    "start_time_ms": 4200,
+    "end_time_ms": 7100,
+    "contact_time_ms": 6240,
+    "confidence": 0.78
+  },
+  "features": [
+    {
+      "name": "dominant_elbow_angle_at_max_wrist_height_deg",
+      "value": 128,
+      "unit": "deg",
+      "confidence": 0.81,
+      "available": true,
+      "feature_version": "1"
+    }
+  ],
+  "findings": [
+    {
+      "rule_id": "clear.low_arm_extension.v1",
+      "label": "Low arm extension at maximum reach",
+      "severity": "moderate",
+      "confidence": 0.81,
+      "evidence": [
+        {
+          "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+          "value": 128,
+          "unit": "deg"
+        }
+      ],
+      "retrieval_tags": [
+        "overhead_clear",
+        "contact_reach",
+        "arm_extension"
+      ]
+    }
+  ],
+  "versions": {
+    "pose_estimator": "mediapipe-0.10",
+    "feature_schema": "1",
+    "rule_set": "1"
+  }
+}

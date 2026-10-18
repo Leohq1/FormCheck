@@ -1,0 +1,50 @@
+{
+  "schema_version": "1",
+  "analysis_id": "019a0000-0000-7000-8000-000000000003",
+  "status": "inconclusive",
+  "quality": {
+    "overall": 0.22,
+    "warnings": [
+      "Dominant ankles left the frame during the swing."
+    ]
+  },
+  "stroke": {
+    "type": "overhead_clear",
+    "start_time_ms": null,
+    "end_time_ms": null,
+    "contact_time_ms": null,
+    "confidence": null
+  },
+  "findings": [],
+  "feedback": {
+    "summary": "",
+    "tips": [],
+    "limitations": [
+      "Technique findings are withheld when pose quality is insufficient."
+    ],
+    "model": "none",
+    "prompt_version": "1"
+  },
+  "versions": {
+    "pipeline": "2026.10.0",
+    "pose_estimator": "mediapipe-0.10",
+    "feature_schema": "1",
+    "rule_set": "1",
+    "corpus": "1",
+    "embedding": "none",
+    "generation": "none",
+    "result_schema": "1"
+  },
+  "error": {
+    "code": "POSE_BODY_CROPPED",
+    "safe_message": "The full body was not visible throughout the stroke.",
+    "retryable": false,
+    "remediation": [
+      "Move the camera farther away.",
+      "Keep both feet and the hitting arm in the frame."
+    ],
+    "correlation_id": "corr-019a0000"
+  },
+  "completed_at": "2026-10-17T20:01:00Z",
+  "expires_at": "2026-10-18T20:01:00Z"
+}

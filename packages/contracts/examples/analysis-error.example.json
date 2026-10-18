@@ -1,0 +1,13 @@
+{
+  "code": "POSE_BODY_CROPPED",
+  "safe_message": "The full body was not visible throughout the stroke.",
+  "retryable": false,
+  "remediation": [
+    "Move the camera farther away.",
+    "Keep both feet and the hitting arm in the frame."
+  ],
+  "correlation_id": "corr-019a0000",
+  "details": {
+    "missing_regions": ["ankles"]
+  }
+}

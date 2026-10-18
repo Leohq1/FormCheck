@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "analysis-findings.schema.json",
+  "title": "AnalysisFindings",
+  "description": "PROVISIONAL scaffold aligned with ImplementationPlan §6.12. Person 3 owns this schema. It becomes authoritative only after review by ≥1 Group A and ≥1 Group B member. Shared finding/quality/stroke shapes live in common.schema.json — amend those defs with cross-group awareness so analysis-result stays in sync.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis_id",
+    "quality",
+    "stroke",
+    "features",
+    "findings",
+    "versions"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["0-draft", "1"],
+      "description": "Use 0-draft for Person 3 provisional fixtures; 1 only after cross-group approval of this schema."
+    },
+    "analysis_id": {
+      "$ref": "common.schema.json#/$defs/analysisId"
+    },
+    "quality": {
+      "$ref": "common.schema.json#/$defs/qualityReport"
+    },
+    "stroke": {
+      "$ref": "common.schema.json#/$defs/strokeInfo"
+    },
+    "features": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "value",
+          "unit",
+          "confidence",
+          "available",
+          "feature_version"
+        ],
+        "properties": {
+          "name": { "type": "string" },
+          "value": { "type": ["number", "null"] },
+          "unit": { "type": "string" },
+          "confidence": {
+            "oneOf": [
+              { "type": "null" },
+              { "type": "number", "minimum": 0, "maximum": 1 }
+            ]
+          },
+          "available": { "type": "boolean" },
+          "feature_version": { "type": "string" }
+        }
+      }
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "$ref": "common.schema.json#/$defs/finding"
+      }
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "required": ["pose_estimator", "feature_schema", "rule_set"],
+      "properties": {
+        "pose_estimator": {
+          "type": "string",
+          "description": "Single string combining estimator name and version (ADR 0001)."
+        },
+        "feature_schema": { "type": "string" },
+        "rule_set": { "type": "string" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": "0-draft",
+      "analysis_id": "019a0000-0000-7000-8000-000000000001",
+      "quality": {
+        "overall": 0.84,
+        "warnings": []
+      },
+      "stroke": {
+        "type": "overhead_clear",
+        "start_time_ms": 4200,
+        "end_time_ms": 7100,
+        "contact_time_ms": 6240,
+        "confidence": 0.78
+      },
+      "features": [
+        {
+          "name": "dominant_elbow_angle_at_max_wrist_height_deg",
+          "value": 128,
+          "unit": "deg",
+          "confidence": 0.81,
+          "available": true,
+          "feature_version": "1"
+        }
+      ],
+      "findings": [
+        {
+          "rule_id": "clear.low_arm_extension.v1",
+          "label": "Low arm extension at maximum reach",
+          "severity": "moderate",
+          "confidence": 0.81,
+          "evidence": [
+            {
+              "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+              "value": 128,
+              "unit": "deg"
+            }
+          ],
+          "retrieval_tags": [
+            "overhead_clear",
+            "contact_reach",
+            "arm_extension"
+          ]
+        }
+      ],
+      "versions": {
+        "pose_estimator": "mediapipe-0.10",
+        "feature_schema": "1",
+        "rule_set": "1"
+      }
+    }
+  ]
+}
