@@ -20,10 +20,26 @@ then repeat the import smoke check and tests before accepting the new lockfile.
 FFmpeg and ffprobe are separate system tools required by later video integration
 tests; uv does not install them.
 
-The initial MediaPipe lock also brings in `opencv-contrib-python` alongside the
-requested `opencv-python-headless`. Both provide `cv2`; the locked Windows
-environment passes the import smoke check, but this does not establish a purely
-headless deployment. Review that overlap before choosing a production image.
+The root uv configuration excludes MediaPipe 1.1.1's transitive
+`opencv-contrib-python` dependency so the explicit `opencv-python-headless`
+dependency is the sole provider of `cv2`. This uses uv's supported
+[dependency exclusion](https://docs.astral.sh/uv/concepts/resolution/#dependency-exclusions)
+and is scoped to the reviewed MediaPipe version. The environment test checks
+installed distribution records to prevent competing `cv2` providers.
+
+If updating an environment created before this exclusion, repair shared files
+while removing the old contrib distribution:
+
+```powershell
+uv sync --locked --all-groups --reinstall-package opencv-python-headless
+```
+
+This deliberately substitutes headless OpenCV for MediaPipe's declared contrib
+distribution. Task 1 verifies dependency imports, not Pose Landmarker inference;
+Task 4 must validate real inference with an explicitly supplied model and
+synthetic video to establish whether the adapter needs any contrib-only APIs.
+Review the exclusion and rerun those checks when upgrading MediaPipe. Use the
+documented uv workflow so this project-level exclusion is respected.
 
 ## Optional local assets
 

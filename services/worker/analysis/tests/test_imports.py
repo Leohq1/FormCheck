@@ -15,3 +15,15 @@ def test_person3_packages_are_importable() -> None:
             formcheck_video,
         )
     )
+
+
+def test_analysis_environment_has_one_cv2_provider() -> None:
+    from importlib.metadata import distributions
+
+    providers = sorted(
+        distribution.metadata["Name"].lower().replace("_", "-")
+        for distribution in distributions()
+        if any(str(path).startswith("cv2/") for path in distribution.files or ())
+    )
+
+    assert providers == ["opencv-python-headless"]
