@@ -79,8 +79,7 @@ export function UploadPage() {
       storeCapabilityToken(created.analysis_id, created.capability_token)
       storeAnalysisClip(created.analysis_id, file!)
       await api.uploadFile(
-        created.analysis_id,
-        created.capability_token,
+        created.upload_url,
         file!,
         file!.type || 'video/mp4',
       )

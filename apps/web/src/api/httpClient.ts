@@ -51,18 +51,10 @@ export function createHttpClient(baseUrl: string): AnalysisApi {
       })
     },
 
-    async uploadFile(
-      analysisId: string,
-      capabilityToken: string,
-      file: File,
-      contentType: string,
-    ) {
-      const response = await fetch(`${root}/api/v1/analyses/${analysisId}/upload`, {
+    async uploadFile(uploadUrl: string, file: File, contentType: string) {
+      const response = await fetch(uploadUrl, {
         method: 'PUT',
-        headers: {
-          'Content-Type': contentType,
-          Authorization: `Bearer ${capabilityToken}`,
-        },
+        headers: { 'Content-Type': contentType },
         body: file,
       })
       if (!response.ok) {
