@@ -1,0 +1,23 @@
+name: formcheck
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: formcheck-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: formcheck
+      POSTGRES_PASSWORD: formcheck
+      POSTGRES_DB: formcheck
+    volumes:
+      - formcheck-pgvector:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U formcheck -d formcheck"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  formcheck-pgvector:

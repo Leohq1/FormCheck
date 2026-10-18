@@ -1,0 +1,9 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "uncertain-contact",
+  "quality": { "overall": 0.74, "warnings": ["contact_uncertain"] },
+  "stroke": { "type": "overhead_clear", "confidence": 0.55 },
+  "features": [],
+  "findings": [],
+  "versions": { "pose_estimator": "mediapipe", "feature_schema": "1", "rule_set": "1" }
+}

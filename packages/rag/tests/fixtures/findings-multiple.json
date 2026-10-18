@@ -1,0 +1,34 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "multiple",
+  "quality": { "overall": 0.8, "warnings": [] },
+  "stroke": { "type": "overhead_clear", "confidence": 0.8 },
+  "features": [],
+  "findings": [
+    {
+      "rule_id": "clear.low_arm_extension.v1",
+      "label": "Low arm extension at maximum reach",
+      "severity": "moderate",
+      "confidence": 0.81,
+      "evidence": [
+        {
+          "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+          "value": 128,
+          "unit": "deg"
+        }
+      ],
+      "retrieval_tags": ["overhead_clear", "contact_reach", "arm_extension"]
+    },
+    {
+      "rule_id": "clear.limited_trunk_rotation.v1",
+      "label": "Limited trunk rotation",
+      "severity": "low",
+      "confidence": 0.74,
+      "evidence": [
+        { "feature": "shoulder_hip_separation_deg", "value": 12, "unit": "deg" }
+      ],
+      "retrieval_tags": ["overhead_clear", "trunk_rotation"]
+    }
+  ],
+  "versions": { "pose_estimator": "mediapipe", "feature_schema": "1", "rule_set": "1" }
+}

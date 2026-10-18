@@ -1,0 +1,22 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "diagnostics",
+  "quality": { "overall": 0.88, "warnings": [] },
+  "stroke": { "type": "overhead_clear", "confidence": 0.8 },
+  "features": [
+    {
+      "name": "dominant_elbow_angle_at_max_wrist_height_deg",
+      "value": 90,
+      "unit": "deg",
+      "confidence": 0.95,
+      "available": true,
+      "feature_version": "1"
+    }
+  ],
+  "findings": [],
+  "diagnostics": {
+    "would_trigger": true,
+    "rule_id": "clear.low_arm_extension.v1"
+  },
+  "versions": { "pose_estimator": "mediapipe", "feature_schema": "1", "rule_set": "1" }
+}

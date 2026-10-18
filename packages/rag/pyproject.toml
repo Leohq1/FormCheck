@@ -1,0 +1,20 @@
+[project]
+name = "formcheck-rag"
+version = "0.1.0"
+description = "Coaching retrieval and template feedback for FormCheck."
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.6"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
