@@ -26,11 +26,15 @@ export function StatusBanner({
   return (
     <div
       role={role}
-      className={`rounded-sm border px-4 py-3 ${toneStyles[tone]}`}
+      className={`rounded-lg border px-5 py-4 ${toneStyles[tone]}`}
     >
-      <p className="font-medium text-[var(--color-ink)]">{title}</p>
+      <p className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-ink)]">
+        {title}
+      </p>
       {children ? (
-        <div className="mt-1 text-sm text-[var(--color-muted)]">{children}</div>
+        <div className="mt-2 text-sm leading-relaxed text-[var(--color-muted)]">
+          {children}
+        </div>
       ) : null}
     </div>
   )
