@@ -1,0 +1,8 @@
+{
+  "schema_version": "1",
+  "analysis_id": "019a0000-0000-7000-8000-000000000001",
+  "stage": "pose_estimation",
+  "progress": null,
+  "message_key": "estimating_pose",
+  "updated_at": "2026-10-17T20:00:00Z"
+}

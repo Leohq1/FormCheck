@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "analysis-job.schema.json",
+  "title": "AnalysisJob",
+  "description": "Produced by Person 2 and consumed by Person 3. video_object_key MUST point at the privately stored source upload; Person 3's first stage produces normalized artifacts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis_id",
+    "video_object_key",
+    "stroke",
+    "handedness",
+    "view_hint",
+    "pipeline_version"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1",
+      "description": "Ratified contract version. Do not use 0-draft for jobs."
+    },
+    "analysis_id": {
+      "$ref": "common.schema.json#/$defs/analysisId"
+    },
+    "video_object_key": {
+      "type": "string",
+      "pattern": "^analyses/[^/]+/source/.+$",
+      "description": "Logical object key for the source upload, e.g. analyses/{analysis_id}/source/{filename}."
+    },
+    "stroke": {
+      "type": "string",
+      "enum": ["overhead_clear"]
+    },
+    "handedness": {
+      "type": "string",
+      "enum": ["left", "right"]
+    },
+    "view_hint": {
+      "type": "string",
+      "enum": ["side", "rear_three_quarter"]
+    },
+    "pipeline_version": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "examples": [
+    {
+      "schema_version": "1",
+      "analysis_id": "019a0000-0000-7000-8000-000000000001",
+      "video_object_key": "analyses/019a0000-0000-7000-8000-000000000001/source/clear.mp4",
+      "stroke": "overhead_clear",
+      "handedness": "right",
+      "view_hint": "rear_three_quarter",
+      "pipeline_version": "2026.10.0"
+    }
+  ]
+}

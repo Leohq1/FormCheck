@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.schema.json",
+  "title": "FormCheckSharedDefs",
+  "description": "Shared $defs for quality, stroke, evidence, and finding shapes. finding/evidence are consumed by both analysis-findings (Person 3) and analysis-result (Person 2) so they cannot drift.",
+  "$defs": {
+    "analysisId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Analysis identifier (UUID)."
+    },
+    "qualityReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["overall", "warnings"],
+      "properties": {
+        "overall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "warnings": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "strokeInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "confidence"],
+      "properties": {
+        "type": { "type": "string", "enum": ["overhead_clear"] },
+        "start_time_ms": { "type": ["integer", "null"], "minimum": 0 },
+        "end_time_ms": { "type": ["integer", "null"], "minimum": 0 },
+        "contact_time_ms": { "type": ["integer", "null"], "minimum": 0 },
+        "confidence": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "number", "minimum": 0, "maximum": 1 }
+          ]
+        }
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["feature", "value", "unit"],
+      "properties": {
+        "feature": { "type": "string" },
+        "value": { "type": "number" },
+        "unit": { "type": "string" }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rule_id",
+        "label",
+        "severity",
+        "confidence",
+        "evidence",
+        "retrieval_tags"
+      ],
+      "properties": {
+        "rule_id": { "type": "string" },
+        "label": { "type": "string" },
+        "severity": {
+          "type": "string",
+          "enum": ["minor", "moderate", "major"]
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/evidenceItem" }
+        },
+        "retrieval_tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}
