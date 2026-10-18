@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
 import type { AnalysisResult } from '@/api/types'
 import { ResultsPanel } from '@/components/ResultsPanel'
 
@@ -42,9 +42,22 @@ function result(overrides: Partial<AnalysisResult> = {}): AnalysisResult {
 }
 
 describe('ResultsPanel', () => {
+  afterEach(() => {
+    cleanup()
+  })
+
   it('says no supported fault was detected when findings are empty', () => {
     render(<ResultsPanel result={result()} />)
-    expect(screen.getByText('No supported fault detected.')).toBeInTheDocument()
+    expect(
+      screen.getByText(/No supported fault detected/i),
+    ).toBeInTheDocument()
+  })
+
+  it('renders side-by-side form comparison tapes', () => {
+    render(<ResultsPanel result={result()} />)
+    expect(screen.getByText('Form comparison')).toBeInTheDocument()
+    expect(screen.getByText('Your swing')).toBeInTheDocument()
+    expect(screen.getByText('Reference form')).toBeInTheDocument()
   })
 
   it('shows ratified tips and structured evidence', () => {
@@ -92,6 +105,9 @@ describe('ResultsPanel', () => {
       />,
     )
 
+    expect(screen.getByText('Coaching suggestions')).toBeInTheDocument()
+    expect(screen.queryByText('What to work on')).not.toBeInTheDocument()
+    expect(screen.getByText('Low arm extension at maximum reach')).toBeInTheDocument()
     expect(screen.getByText('Reach through contact')).toBeInTheDocument()
     expect(screen.getByText('Shadow-swing 10 overhead clears.')).toBeInTheDocument()
     expect(screen.getByText(/dominant_elbow_angle_at_max_wrist_height_deg/)).toBeInTheDocument()

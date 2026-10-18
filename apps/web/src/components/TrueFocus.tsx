@@ -227,7 +227,8 @@ export default function TrueFocus({
             }}
             className={`focus-word${manualMode ? ' manual' : ''}${isActive && !manualMode ? ' active' : ''}`}
             style={{
-              filter: dimmed ? `blur(${blurAmount}px)` : 'none',
+              filter:
+                dimmed && blurAmount > 0 ? `blur(${blurAmount}px)` : 'none',
               opacity: dimmed ? unfocusedOpacity : 1,
               transform:
                 focusScale !== 1 && isActive ? `scale(${focusScale})` : undefined,

@@ -15,11 +15,17 @@ CREATE_BODY = {
 }
 
 
-def test_create_rejects_clear_alias_and_unanalyzed_strokes(client):
-    for stroke in ("clear", "smash", "drop"):
-        created = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": stroke})
-        assert created.status_code == 400
-        assert created.json()["detail"].lower() == "unsupported stroke type"
+def test_create_rejects_clear_alias(client):
+    created = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": "clear"})
+    assert created.status_code == 400
+    assert created.json()["detail"].lower() == "unsupported stroke type"
+
+
+@pytest.mark.parametrize("stroke", ["smash", "drop"])
+def test_create_accepts_smash_and_drop(client, stroke):
+    created = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": stroke})
+    assert created.status_code == 201
+    assert created.json()["status"] == "created"
 
 
 def test_health(client):
@@ -116,7 +122,7 @@ def test_delete_is_idempotent(client, seeded_analysis):
     assert second.status_code == 202
 
 
-@pytest.mark.parametrize("stroke", ["clear", "smash", "drop"])
+@pytest.mark.parametrize("stroke", ["clear", "drive", "net"])
 def test_rejects_unsupported_stroke_type(client, stroke):
     body = dict(CREATE_BODY)
     body["stroke"] = stroke

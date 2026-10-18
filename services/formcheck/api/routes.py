@@ -55,7 +55,7 @@ def _iso(dt: datetime | None) -> str | None:
 
 def _validate_create(body: CreateAnalysisRequest) -> None:
     settings = get_settings()
-    if body.stroke != "overhead_clear":
+    if body.stroke not in {"overhead_clear", "smash", "drop"}:
         raise HTTPException(status_code=400, detail="Unsupported stroke type")
     if not body.consent:
         raise HTTPException(status_code=400, detail="Consent is required")

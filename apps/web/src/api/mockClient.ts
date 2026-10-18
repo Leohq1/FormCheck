@@ -98,7 +98,11 @@ export function createMockClient(): AnalysisApi {
       request: CreateAnalysisRequest,
     ): Promise<CreateAnalysisResponse> {
       await delay(200)
-      if (request.stroke !== 'overhead_clear') {
+      if (
+        request.stroke !== 'overhead_clear' &&
+        request.stroke !== 'smash' &&
+        request.stroke !== 'drop'
+      ) {
         throw new Error('Unsupported stroke type')
       }
       if (!request.consent) {

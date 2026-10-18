@@ -1,6 +1,6 @@
 export type SportId = 'badminton'
 
-export type StrokeId = 'overhead_clear'
+export type StrokeId = 'overhead_clear' | 'smash' | 'drop'
 
 export type Handedness = 'left' | 'right'
 
@@ -28,6 +28,16 @@ export const SPORTS: SportConfig[] = [
         id: 'overhead_clear',
         label: 'Overhead clear',
         description: 'One controlled overhead clear with the full body visible.',
+      },
+      {
+        id: 'smash',
+        label: 'Smash',
+        description: 'One overhead smash with the full body visible.',
+      },
+      {
+        id: 'drop',
+        label: 'Drop',
+        description: 'One overhead drop shot with the full body visible.',
       },
     ],
   },
