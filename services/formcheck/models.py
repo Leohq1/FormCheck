@@ -62,3 +62,17 @@ class AuditEvent(Base):
     correlation_id: Mapped[str] = mapped_column(String(64), nullable=False)
     details: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class IdempotencyKey(Base):
+    """Stores first successful response for Idempotency-Key on create/delete."""
+
+    __tablename__ = "idempotency_keys"
+
+    key: Mapped[str] = mapped_column(String(128), primary_key=True)
+    route: Mapped[str] = mapped_column(String(128), primary_key=True)
+    request_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    response_status: Mapped[int] = mapped_column(Integer, nullable=False)
+    response_body: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    analysis_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
