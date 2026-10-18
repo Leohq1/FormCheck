@@ -1,0 +1,29 @@
+import json
+from pathlib import Path
+
+from pydantic import BaseModel, Field
+
+
+class SourceManifest(BaseModel):
+    source_id: str
+    title: str
+    author: str
+    publisher: str
+    publication_date: str
+    license: str = Field(min_length=1)
+    allowed_use: str = Field(min_length=1)
+    stroke_tags: list[str]
+    fault_tags: list[str]
+    phase_tags: list[str] = Field(default_factory=list)
+    review_status: str
+    reviewer: str
+    review_date: str
+    content_hash: str
+    text_file: str | None = None
+
+
+def load_manifest(path: Path) -> list[SourceManifest]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, list):
+        raise ValueError("A source manifest must be a JSON list.")
+    return [SourceManifest.model_validate(item) for item in payload]

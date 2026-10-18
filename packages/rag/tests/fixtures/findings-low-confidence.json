@@ -1,0 +1,26 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "low-confidence",
+  "quality": { "overall": 0.7, "warnings": [] },
+  "stroke": { "type": "overhead_clear", "confidence": 0.7 },
+  "features": [],
+  "findings": [
+    {
+      "rule_id": "clear.low_arm_extension.v1",
+      "label": "Low arm extension at maximum reach",
+      "severity": "low",
+      "confidence": 0.42,
+      "evidence": [
+        {
+          "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+          "value": 130,
+          "unit": "deg",
+          "confidence": 0.42,
+          "available": true
+        }
+      ],
+      "retrieval_tags": ["overhead_clear", "contact_reach", "arm_extension"]
+    }
+  ],
+  "versions": { "pose_estimator": "mediapipe", "feature_schema": "1", "rule_set": "1" }
+}

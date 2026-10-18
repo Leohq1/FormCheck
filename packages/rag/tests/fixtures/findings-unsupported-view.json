@@ -1,0 +1,9 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "unsupported-view",
+  "quality": { "overall": 0.4, "warnings": ["unsupported_view"] },
+  "stroke": { "type": "overhead_clear", "confidence": 0.3 },
+  "features": [],
+  "findings": [],
+  "versions": { "pose_estimator": "mediapipe", "feature_schema": "1", "rule_set": "1" }
+}

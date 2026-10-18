@@ -1,0 +1,36 @@
+[
+  {
+    "source_id": "source-test-clear",
+    "title": "FormCheck synthetic overhead-clear notes",
+    "author": "FormCheck test corpus",
+    "publisher": "FormCheck",
+    "publication_date": "2026-10-17",
+    "license": "project-test",
+    "allowed_use": "Automated tests and local demos only. Not a coaching authority.",
+    "stroke_tags": ["overhead_clear"],
+    "fault_tags": ["contact_reach", "arm_extension", "recovery"],
+    "phase_tags": ["estimated_contact", "recovery"],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "synthetic-clear-v1",
+    "text_file": "clear-coaching.md"
+  },
+  {
+    "source_id": "source-test-pending",
+    "title": "Unapproved elbow notes",
+    "author": "FormCheck test corpus",
+    "publisher": "FormCheck",
+    "publication_date": "2026-10-17",
+    "license": "project-test",
+    "allowed_use": "Must never be retrieved.",
+    "stroke_tags": ["overhead_clear"],
+    "fault_tags": ["contact_reach", "arm_extension"],
+    "phase_tags": ["estimated_contact"],
+    "review_status": "pending",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "synthetic-pending-v1",
+    "text_file": "pending-coaching.md"
+  }
+]

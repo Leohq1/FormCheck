@@ -1,42 +1,43 @@
 # Local infrastructure
 
-Owner: Person 2.
+Owner: Person 2 for the API, Redis, and MinIO stack. The file here now starts only the PostgreSQL database Person 4 needs for coaching retrieval.
 
-Docker Compose runs PostgreSQL (pgvector), Redis, MinIO, the FastAPI service, and the Dramatiq worker.
+The database image is `pgvector/pgvector:pg16`, which is the official Postgres image with the pgvector extension. The local username, password, and database name are all `formcheck`. This password is for the local container only.
 
-## Quick start
+Open a terminal in `infra/local` and use these commands.
 
-```bash
-cd infra/local
-cp .env.example .env
-docker compose up --build
+Start the database and wait until it is ready:
+
+```text
+docker compose up -d
+docker compose ps
 ```
 
-API: `http://localhost:8000`  
-OpenAPI docs: `http://localhost:8000/docs`  
-Object storage console: `http://localhost:9001` (formcheck / formchecksecret)
+Check that vector search is available and the coaching tables exist:
 
-> Note: Compose uses `pgsty/silo` + `pgsty/mc` because official `minio/minio` / `minio/mc` images were removed from Docker Hub in 2026.
-
-Point the web app at the API:
-
-```bash
-cd ../../apps/web
-VITE_API_BASE_URL=http://localhost:8000 npm run dev
+```text
+docker compose exec postgres psql -U formcheck -d formcheck -c "SELECT extname, extversion FROM pg_extension WHERE extname = 'vector';"
+docker compose exec postgres psql -U formcheck -d formcheck -c "\dt"
 ```
 
-## Services
+Stop the database. The saved data remains:
 
-| Service | Port | Role |
-|---|---|---|
-| postgres | 5432 | Job metadata, results JSON, audit, deletion outbox |
-| redis | 6379 | Dramatiq broker |
-| minio | 9000 / 9001 | Private object storage |
-| api | 8000 | Public HTTP API |
-| worker | — | Fake analysis pipeline (replaceable by Group B) |
+```text
+docker compose stop
+```
 
-## Notes
+Start it again later:
 
-- Presigned upload URLs use `MINIO_PUBLIC_ENDPOINT` (`http://localhost:9000`) so the browser can PUT directly.
-- Object keys follow `analyses/{id}/source/{filename}` (see team decisions).
-- Fake worker outcomes can be forced by putting `inconclusive`, `failed`, or `expired` in the filename (same convention as the frontend mock).
+```text
+docker compose start
+```
+
+Stop it and delete the saved data:
+
+```text
+docker compose down -v
+```
+
+The coaching tables are created only the first time the data volume is empty. After `docker compose down -v`, the next `docker compose up -d` creates them again.
+
+Redis, MinIO, the API, and the worker are not in this file yet. Person 2 still owns those services.
