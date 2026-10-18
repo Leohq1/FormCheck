@@ -165,6 +165,7 @@ export function AnalysisPage() {
         <ResultsPanel
           result={result}
           yourClipUrl={getAnalysisClip(analysisId)}
+          referenceClipUrl="/reference/overhead_clear.mov"
         />
       ) : null}
 

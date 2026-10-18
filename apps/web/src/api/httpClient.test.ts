@@ -54,4 +54,19 @@ describe('http client upload', () => {
     })
     expect(String(fetchMock.mock.calls[2][0])).toContain('/complete-upload')
   })
+
+  it('accepts a delete response that has no JSON body', async () => {
+    const fetchMock = vi.fn().mockResolvedValueOnce(new Response(null, { status: 202 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const api = createHttpClient('http://api.local')
+    await expect(
+      api.deleteAnalysis('11111111-1111-4111-8111-111111111111', 'token'),
+    ).resolves.toBeUndefined()
+
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({
+      method: 'DELETE',
+      headers: { Authorization: 'Bearer token' },
+    })
+  })
 })

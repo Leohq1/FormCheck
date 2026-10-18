@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowDown01Icon, Tick02Icon } from '@hugeicons/core-free-icons'
+import { ArrowDown01Icon, Tick02Icon } from '@/icons'
 
 import './GlideSelect.css'
 

@@ -1,25 +1,6 @@
 import { Link } from 'react-router-dom'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
-import { BiLogoVisualStudio } from 'react-icons/bi'
-import {
-  SiCursor,
-  SiDocker,
-  SiFastapi,
-  SiFramer,
-  SiGooglegemini,
-  SiGsap,
-  SiMediapipe,
-  SiPostgresql,
-  SiPython,
-  SiReact,
-  SiReactquery,
-  SiReactrouter,
-  SiTailwindcss,
-  SiTypescript,
-  SiUv,
-  SiVite,
-} from 'react-icons/si'
+import { ArrowDown01Icon } from '@/icons'
 import AnimatedContent from '@/components/AnimatedContent'
 import { BrandErrorBoundary } from '@/components/BrandErrorBoundary'
 import GridMotion from '@/components/GridMotion'
@@ -28,105 +9,113 @@ import TrueFocus from '@/components/TrueFocus'
 import { RECORDING_TIPS } from '@/sports/config'
 
 /** Stack reflected in apps/web, services/api, and the MediaPipe analysis worker. */
+function StackMark({ label }: { label: string }) {
+  return (
+    <span className="inline-flex h-8 items-center text-[11px] font-semibold tracking-wide">
+      {label}
+    </span>
+  )
+}
+
 const TECH_LOGOS: LogoItem[] = [
   {
-    node: <SiReact />,
+    node: <StackMark label="React" />,
     title: 'React',
     href: 'https://react.dev',
     hoverColor: '#61dafb',
   },
   {
-    node: <SiTypescript />,
+    node: <StackMark label="TS" />,
     title: 'TypeScript',
     href: 'https://www.typescriptlang.org',
     hoverColor: '#3178c6',
   },
   {
-    node: <SiVite />,
+    node: <StackMark label="Vite" />,
     title: 'Vite',
     href: 'https://vite.dev',
     hoverColor: '#646cff',
   },
   {
-    node: <SiTailwindcss />,
+    node: <StackMark label="CSS" />,
     title: 'Tailwind CSS',
     href: 'https://tailwindcss.com',
     hoverColor: '#38bdf8',
   },
   {
-    node: <SiGsap />,
+    node: <StackMark label="GSAP" />,
     title: 'GSAP',
     href: 'https://gsap.com',
     hoverColor: '#88ce02',
   },
   {
-    node: <SiFramer />,
+    node: <StackMark label="Motion" />,
     title: 'Motion',
     href: 'https://motion.dev',
     hoverColor: '#ff0055',
   },
   {
-    node: <SiReactrouter />,
+    node: <StackMark label="Router" />,
     title: 'React Router',
     href: 'https://reactrouter.com',
     hoverColor: '#ca4245',
   },
   {
-    node: <SiReactquery />,
+    node: <StackMark label="Query" />,
     title: 'TanStack Query',
     href: 'https://tanstack.com/query',
     hoverColor: '#ff4154',
   },
   {
-    node: <SiPython />,
+    node: <StackMark label="Python" />,
     title: 'Python',
     href: 'https://www.python.org',
     hoverColor: '#3776ab',
   },
   {
-    node: <SiFastapi />,
+    node: <StackMark label="API" />,
     title: 'FastAPI',
     href: 'https://fastapi.tiangolo.com',
     hoverColor: '#009688',
   },
   {
-    node: <SiMediapipe />,
+    node: <StackMark label="Pose" />,
     title: 'MediaPipe',
     href: 'https://ai.google.dev/edge/mediapipe',
     hoverColor: '#0097a7',
   },
   {
-    node: <SiPostgresql />,
+    node: <StackMark label="SQL" />,
     title: 'PostgreSQL',
     href: 'https://www.postgresql.org',
     hoverColor: '#4169e1',
   },
   {
-    node: <SiDocker />,
+    node: <StackMark label="Docker" />,
     title: 'Docker',
     href: 'https://www.docker.com',
     hoverColor: '#2496ed',
   },
   {
-    node: <SiUv />,
+    node: <StackMark label="uv" />,
     title: 'uv',
     href: 'https://docs.astral.sh/uv',
     hoverColor: '#de5fe9',
   },
   {
-    node: <SiGooglegemini />,
+    node: <StackMark label="Gemini" />,
     title: 'Gemini',
     href: 'https://gemini.google.com',
     hoverColor: '#8e75b2',
   },
   {
-    node: <SiCursor />,
+    node: <StackMark label="Cursor" />,
     title: 'Cursor',
     href: 'https://cursor.com',
     hoverColor: '#ffffff',
   },
   {
-    node: <BiLogoVisualStudio />,
+    node: <StackMark label="Code" />,
     title: 'VS Code',
     href: 'https://code.visualstudio.com',
     hoverColor: '#007acc',
@@ -281,7 +270,7 @@ export function GuidancePage() {
 
       <section
         id="recording-tips"
-        className="relative flex min-h-[100svh] scroll-mt-0 flex-col overflow-hidden bg-[var(--color-ink)]"
+        className="relative flex min-h-[100svh] scroll-mt-0 flex-col overflow-hidden bg-[var(--color-ink)] [content-visibility:auto] [contain-intrinsic-size:auto_100svh]"
       >
         <LandingBackdrop />
 
@@ -346,7 +335,7 @@ export function GuidancePage() {
 
       <section
         aria-labelledby="tech-stack-heading"
-        className="relative overflow-hidden bg-[var(--color-ink)] px-5 py-16 sm:px-8 sm:py-20"
+        className="relative overflow-hidden bg-[var(--color-ink)] px-5 py-16 [content-visibility:auto] [contain-intrinsic-size:auto_28rem] sm:px-8 sm:py-20"
       >
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--color-ink)] via-[var(--color-ink)]/95 to-transparent"

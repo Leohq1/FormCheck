@@ -1,4 +1,5 @@
 import type { AnalysisFinding, AnalysisResult, FeedbackTip } from '@/api/types'
+import { SkeletonVideo } from '@/components/SkeletonVideo'
 import { formatConfidence } from '@/lib/videoValidation'
 
 interface ResultsPanelProps {
@@ -18,30 +19,18 @@ interface CoachingItem {
 function VideoTape({
   label,
   src,
-  poster,
 }: {
   label: string
   src?: string | null
-  poster: string
 }) {
   return (
     <figure className="video-tape m-0 min-w-0">
       <div className="video-tape__bezel">
         {src ? (
-          <video
-            className="video-tape__media"
-            controls
-            playsInline
-            preload="metadata"
-            poster={poster}
-            src={src}
-          >
-            <track kind="captions" />
-          </video>
+          <SkeletonVideo src={src} label={label} />
         ) : (
           <div
             className="video-tape__media video-tape__media--empty"
-            style={{ backgroundImage: `url(${poster})` }}
             role="img"
             aria-label={`${label} preview placeholder`}
           >
@@ -144,20 +133,12 @@ export function ResultsPanel({
             Form comparison
           </h2>
           <p className="text-sm text-[var(--color-muted)]">
-            Your swing beside a reference model of the same stroke.
+            Your swing beside the reference clear, each with a MediaPipe skeleton.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <VideoTape
-            label="Your swing"
-            src={yourClipUrl}
-            poster="/images/hero-badminton.jpg"
-          />
-          <VideoTape
-            label="Reference form"
-            src={referenceClipUrl}
-            poster="/images/hero-court.jpg"
-          />
+          <VideoTape label="Your swing" src={yourClipUrl} />
+          <VideoTape label="Reference form" src={referenceClipUrl} />
         </div>
       </section>
 

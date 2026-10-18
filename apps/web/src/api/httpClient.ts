@@ -32,7 +32,12 @@ async function requestJson<T>(
     return undefined as T
   }
 
-  return (await response.json()) as T
+  const body = await response.text()
+  if (!body) {
+    return undefined as T
+  }
+
+  return JSON.parse(body) as T
 }
 
 export function createHttpClient(baseUrl: string): AnalysisApi {
