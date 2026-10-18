@@ -29,3 +29,6 @@ models/
 postgres-data/
 redis-data/
 minio-data/
+
+.agents/
+skills-lock.json
