@@ -624,6 +624,8 @@ evals/pose/
 evals/rules/
 ```
 
+Person 3 owns pose and rule evaluation code and reports in `evals/pose/` and `evals/rules/`. Person 4 owns `evals/retrieval/`, `evals/generation/`, and `evals/system/` and coordinates the combined product evaluation with Person 3 and the badminton coach.
+
 ### 6.3 Pipeline responsibilities
 
 Implement:
@@ -644,16 +646,20 @@ Video
 
 ### 6.4 Video preprocessing
 
-Define and implement the normalization requirements with Person 2.
+Person 3 owns the inspection and normalization library in `packages/video/`. Person 2 owns upload acceptance, private storage, the worker framework, retries, cancellation, progress, retention, and cleanup. Person 3's analysis stage reads and writes video artifacts through Person 2's storage abstraction; it does not own object-store credentials or lifecycle policy.
+
+The analysis job points to the privately stored source upload. Person 3's first worker stage inspects that object, rejects ineligible media with a stable remediation code, and produces the normalized video and timestamp map.
 
 Target normalized output:
 
 - MP4 container
-- H.264 video
-- Constant frame rate
+- H.264/AVC video with `yuv420p` pixel format
+- Constant 60 fps when the inspected source rate is at least 50 fps; otherwise constant 30 fps
 - Rotation applied
 - Audio removed
 - Maximum long edge of 1920 pixels
+- Aspect ratio preserved and dimensions made even
+- Presentation timestamps rebased to zero and monotonic
 - Frame-to-source timestamp map preserved
 
 Inspect media before processing:
@@ -666,7 +672,17 @@ Inspect media before processing:
 - Rotation
 - Decode validity
 
-Media security and storage are Person 2’s responsibility, but processing rules are Person 3’s responsibility.
+The timestamp-map JSON must contain the normalization-contract version and, for each output frame, `frame_index`, `normalized_timestamp_ms`, and `source_timestamp_ms`. The normalization result must record the logical object keys, source and output hashes, output media metadata, FFmpeg version, and normalization-contract version.
+
+Use these logical object names:
+
+```text
+analyses/{analysis_id}/source/{filename}
+analyses/{analysis_id}/normalized/video.mp4
+analyses/{analysis_id}/normalized/timestamps.json
+```
+
+Person 2 may replace the physical storage backend without changing these keys.
 
 ### 6.5 PoseEstimator interface
 
@@ -790,7 +806,7 @@ Implement a versioned feature registry.
 
 Initial candidate features:
 
-- Elbow angle near estimated contact
+- Dominant-elbow angle at maximum dominant-wrist height
 - Elbow-extension timing
 - Hand height
 - Shoulder–hip separation
@@ -803,9 +819,9 @@ Every feature must provide:
 
 ```json
 {
-  "name": "elbow_extension_peak_offset_ms",
-  "value": 92,
-  "unit": "ms",
+  "name": "dominant_elbow_angle_at_max_wrist_height_deg",
+  "value": 128,
+  "unit": "deg",
   "confidence": 0.81,
   "available": true,
   "feature_version": "1"
@@ -823,15 +839,18 @@ finding
 inconclusive
 ```
 
-Example rule:
+The first vertical-slice feature is `dominant_elbow_angle_at_max_wrist_height_deg`. It uses maximum wrist height as a camera-observable reach proxy and therefore does not require precise shuttle-contact detection. Contact-dependent timing remains a later feature.
+
+First candidate rule definition:
 
 ```yaml
-rule_id: clear.late_elbow_extension.v1
-stroke: clear
+rule_id: clear.low_arm_extension.v1
+stroke: overhead_clear
+status: candidate
+enabled: false
 
 requires:
-  - elbow_extension_peak_offset_ms
-  - contact_time
+  - dominant_elbow_angle_at_max_wrist_height_deg
 
 applicable_when:
   supported_view:
@@ -839,14 +858,15 @@ applicable_when:
     - rear_three_quarter
   minimum_feature_confidence: 0.70
 
-condition:
-  elbow_extension_peak_offset_ms > 45
+condition: unset_until_coach_calibration
 
 retrieval_tags:
-  - clear
-  - timing
-  - elbow_extension
+  - overhead_clear
+  - contact_reach
+  - arm_extension
 ```
+
+The production engine must skip a disabled rule. Unit tests may use a clearly named test-only rule with a synthetic threshold to verify engine behavior; that threshold must never appear in production configuration.
 
 Initial rule candidates:
 
@@ -863,8 +883,11 @@ A candidate rule must not be enabled merely because it sounds biomechanically re
 
 Return `AnalysisFindings`:
 
+Person 3 drafts `packages/contracts/analysis-findings.schema.json`, but the schema becomes authoritative only after review by at least one Group A member and one Group B member. Until that review is complete, Person 3 must use a provisional internal Pydantic model and fixtures with `"schema_version": "0-draft"`. Provisional output must not be described as shared-schema compliant, and downstream integration must target the approved version.
+
 ```json
 {
+  "schema_version": "0-draft",
   "analysis_id": "abc123",
   "quality": {
     "overall": 0.84,
@@ -879,21 +902,21 @@ Return `AnalysisFindings`:
   },
   "findings": [
     {
-      "rule_id": "clear.late_elbow_extension.v1",
-      "label": "Late elbow extension",
+      "rule_id": "clear.low_arm_extension.v1",
+      "label": "Low arm extension at maximum reach",
       "severity": "moderate",
       "confidence": 0.81,
       "evidence": [
         {
-          "feature": "elbow_extension_peak_offset_ms",
-          "value": 92,
-          "unit": "ms"
+          "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+          "value": 128,
+          "unit": "deg"
         }
       ],
       "retrieval_tags": [
-        "clear",
-        "timing",
-        "elbow_extension"
+        "overhead_clear",
+        "contact_reach",
+        "arm_extension"
       ]
     }
   ],
@@ -936,12 +959,22 @@ Person 4 will use these fixtures to develop the RAG system before the real pose 
 - Pose and rule evaluation scripts
 - Analysis-pipeline documentation
 
-### 6.15 Acceptance criteria
+### 6.15 External prerequisites and asset policy
+
+Implementation may begin without evaluation media, but end-to-end and rule-enablement claims require external inputs that are not currently in the repository.
+
+- The team supplies at least one consented overhead-clear sample video through a local path named by `FORMCHECK_SAMPLE_VIDEO`. Participant videos must not be committed.
+- The MediaPipe model is obtained through a documented setup script or manual download and referenced by `MEDIAPIPE_POSE_MODEL_PATH`. Model binaries must not be committed unless licensing and repository policy are explicitly approved. Record the expected model filename, upstream URL, license, version, and SHA-256 checksum in setup documentation.
+- When either asset is absent, asset-dependent tests must skip with a clear reason. Unit tests using synthetic landmarks and metadata must still run.
+- A coach-labeled dataset is required before enabling any production fault rule. Until it exists and the rule reaches at least 0.80 precision on the held-out labeled set, the rule remains `candidate` with `enabled: false`.
+- A golden expected result is created only after the sample video's consent, view, handedness, and expected stroke window have been reviewed. It must record who labeled it and which pipeline version produced it.
+
+### 6.16 Acceptance criteria
 
 Person 3’s work is complete when:
 
 - The pipeline processes a valid sample video.
-- Every output follows `AnalysisFindings`.
+- Every provisional output validates against the internal `0-draft` model; integration output validates against the cross-group-approved `AnalysisFindings` schema.
 - Missing or unreliable data causes abstention.
 - Left- and right-handed normalization is tested.
 - Scale and translation invariance are tested.
@@ -1110,7 +1143,7 @@ Return:
   "summary": "The clip suggests that elbow extension occurred later than the configured reference range.",
   "tips": [
     {
-      "finding_id": "clear.late_elbow_extension.v1",
+      "finding_id": "clear.low_arm_extension.v1",
       "title": "Prepare the hitting arm earlier",
       "explanation": "...",
       "practice_cue": "...",
@@ -1464,15 +1497,14 @@ Meet to finalize:
 
 ## Person 2 and Person 3
 
-Meet to finalize:
+The boundary is resolved as follows:
 
-- Video-object naming
-- FFmpeg responsibilities
-- Job schema
-- Progress updates
-- Worker retries
-- Artifact storage
-- Cancellation checks
+- Person 2 owns upload handling, private object storage, job creation, worker orchestration, progress persistence, retries, cancellation, retention, and artifact deletion.
+- Person 3 owns ffprobe inspection, analysis eligibility, FFmpeg normalization, timestamp mapping, and all later analysis stages.
+- Person 3 reads and writes artifacts only through Person 2's storage abstraction.
+- Logical video object names and normalization output are fixed by section 6.4.
+- Person 2 produces the analysis-job message. Person 3 reports stage progress through the shared progress contract and checks cancellation between expensive stages.
+- Retry policy belongs to Person 2; analysis operations owned by Person 3 must be deterministic and safe to rerun for the same analysis and pipeline version.
 
 ## Person 3 and Person 4
 

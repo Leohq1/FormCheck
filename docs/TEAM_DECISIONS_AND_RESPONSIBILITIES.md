@@ -37,9 +37,9 @@ Each person may depend on another person's documented output, but not on that pe
 | Person | Owned paths |
 |---|---|
 | Person 1 | `apps/web/` |
-| Person 2 | `services/api/`, worker orchestration in `services/worker/`, database migrations, `infra/local/` |
-| Person 3 | `packages/video/`, `packages/pose/`, `packages/biomechanics/`, `packages/rules/`, analysis stages in `services/worker/` |
-| Person 4 | `packages/rag/`, `corpus/manifests/`, `evals/`, coaching stages in `services/worker/` |
+| Person 2 | `services/api/`, the worker framework and orchestration in `services/worker/`, database migrations, `infra/local/` |
+| Person 3 | `packages/video/`, `packages/pose/`, `packages/biomechanics/`, `packages/rules/`, `evals/pose/`, `evals/rules/`, and analysis-stage logic in `services/worker/analysis/` |
+| Person 4 | `packages/rag/`, `corpus/manifests/`, `evals/retrieval/`, `evals/generation/`, `evals/system/`, overall evaluation coordination, and coaching-stage logic in `services/worker/coaching/` |
 | Shared | `packages/contracts/`, root configuration, cross-module tests, architecture decisions |
 
 Changes to `packages/contracts/` require review by at least one person from Group A and one person from Group B.
@@ -111,6 +111,27 @@ expired
 
 Server-side validation is authoritative. Frontend checks exist only to provide faster feedback.
 
+#### Video-processing ownership and handoff
+
+- Person 2 accepts the upload, performs security and request-level validation, stores the original object privately, creates the job, and supplies storage, retry, cancellation, and progress-reporting facilities.
+- Person 3 owns `packages/video/`, including ffprobe inspection, analysis-level eligibility checks, FFmpeg normalization, and generation of the frame-to-source timestamp map.
+- Person 3's analysis stage reads the original object through Person 2's storage abstraction and writes normalized artifacts through the same abstraction. It must not implement object-store credentials or lifecycle policy.
+- Person 2 must not duplicate FFmpeg or analysis-specific validation inside the API or orchestration layer.
+
+The normalized-video contract is:
+
+- MP4 container with H.264/AVC video and `yuv420p` pixel format.
+- Constant frame rate: 60 fps when the inspected source rate is at least 50 fps; otherwise 30 fps. Normalization never claims to create motion detail absent from the source.
+- Display rotation applied to pixels and rotation metadata cleared.
+- Audio and non-video streams removed.
+- Long edge no greater than 1920 pixels, aspect ratio preserved, and output dimensions made even.
+- Presentation timestamps begin at zero and are monotonic.
+- A JSON timestamp map records each normalized frame index and timestamp together with its nearest source timestamp.
+- The inspection result records source hash, duration, codec, dimensions, nominal and average frame rate, rotation, and decode validity.
+- The normalization result records the normalized-object key, timestamp-map object key, output hash, output metadata, FFmpeg version, and normalization-contract version.
+
+The canonical object names are `analyses/{analysis_id}/source/{filename}`, `analyses/{analysis_id}/normalized/video.mp4`, and `analyses/{analysis_id}/normalized/timestamps.json`. Person 2 may change the physical storage backend without changing these logical keys.
+
 ### 4.5 Access, privacy, and retention
 
 - The MVP has no accounts.
@@ -144,6 +165,8 @@ packages/contracts/analysis-error.schema.json
 ```
 
 Each schema must include a version, required and optional fields, enumerated values, and at least one valid example.
+
+Person 3 drafts `analysis-findings.schema.json`, but it becomes authoritative only after review by at least one Group A member and one Group B member. Before approval, Person 3 may use a provisional internal model and fixtures marked `schema_version: "0-draft"`; those outputs must not be described as compliant with the shared contract. Person 2 and Person 4 must integrate only against the approved schema version.
 
 ### 5.1 Analysis job
 
@@ -308,18 +331,18 @@ The fake worker must accept a real `AnalysisJob`, report realistic stages, and r
 
 ### Objective
 
-Convert a normalized video into conservative, explainable, rule-produced technique findings.
+Convert a privately stored source video into a normalized analysis artifact and then into conservative, explainable, rule-produced technique findings.
 
 ### First tasks
 
 1. Define the `PoseEstimator` interface and canonical `PoseSequence`.
 2. Implement `MediaPipePoseEstimator`.
-3. Process one team-owned sample stroke video (clear, smash, or drop).
+3. Process one consented team-supplied overhead-clear video when `FORMCHECK_SAMPLE_VIDEO` is available; otherwise keep the asset-dependent test explicitly skipped.
 4. Save timestamps, canonical landmarks, coordinates, confidence, and missing-landmark state.
 5. Implement initial pose-quality checks.
 6. Implement stroke-window and phase prototypes.
-7. Implement one interpretable feature and one candidate rule.
-8. Produce a schema-valid `AnalysisFindings` fixture for Person 4.
+7. Implement `dominant_elbow_angle_at_max_wrist_height_deg` and a disabled `clear.low_arm_extension.v1` candidate rule.
+8. Produce an `AnalysisFindings` fixture marked `schema_version: "0-draft"` until the shared schema receives cross-group approval.
 9. Add unit, property, and evaluation tests.
 
 ### Required processing stages
@@ -338,7 +361,7 @@ video validation
 
 ### Initial feature recommendation
 
-Begin with contact reach or arm extension. Do not begin with precise extension timing until the estimated-contact method has been evaluated.
+Begin with dominant-elbow angle at maximum dominant-wrist height as a camera-observable arm-extension proxy. Do not begin with precise extension timing until the estimated-contact method has been evaluated.
 
 ### Restrictions
 
@@ -347,7 +370,7 @@ Begin with contact reach or arm extension. Do not begin with precise extension t
 - Do not infer a value across long occlusions.
 - Do not fire a rule when required feature confidence is too low.
 - Do not rely on a language model to decide whether a fault exists.
-- Do not enable a rule until it meets the agreed expert-labeled precision threshold.
+- Do not enable a rule until it reaches at least 0.80 precision on a held-out coach-labeled set.
 
 ### Person 3 completion criteria
 
