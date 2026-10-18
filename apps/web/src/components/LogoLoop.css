@@ -90,6 +90,12 @@
   text-decoration: none;
   transition:
     opacity 0.35s ease,
+    color 0.35s ease;
+}
+
+.logoloop[data-muted] .logoloop__content {
+  transition:
+    opacity 0.35s ease,
     filter 0.35s ease,
     color 0.35s ease;
 }

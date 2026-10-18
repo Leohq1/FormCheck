@@ -74,7 +74,7 @@ def normalize_video(
 ) -> NormalizationResult:
     video_output.parent.mkdir(parents=True, exist_ok=True)
     timestamp_output.parent.mkdir(parents=True, exist_ok=True)
-    temp_video = video_output.with_name(video_output.name + ".partial")
+    temp_video = video_output.with_name(f"{video_output.stem}.partial{video_output.suffix}")
     temp_timestamps = timestamp_output.with_name(timestamp_output.name + ".partial")
     fps_value = inspection.average_fps if inspection.average_fps is not None else inspection.nominal_fps
     if fps_value is None:

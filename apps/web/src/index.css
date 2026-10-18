@@ -182,6 +182,69 @@ body {
     0 16px 36px rgba(0, 0, 0, 0.28);
 }
 
+.video-tape__stage {
+  position: relative;
+}
+
+.video-tape__skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.video-tape__controls {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 1.4rem 0.7rem 0.55rem;
+  background: linear-gradient(to top, rgba(12, 16, 15, 0.78), transparent);
+}
+
+.video-tape__play {
+  border: 0;
+  background: transparent;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.video-tape__scrub {
+  min-width: 0;
+  flex: 1;
+  accent-color: #ae3121;
+}
+
+.video-tape__time {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.6875rem;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.video-tape__status {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.6rem;
+  z-index: 2;
+  margin: 0;
+  border-radius: 999px;
+  background: rgba(20, 26, 25, 0.72);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.88);
+  pointer-events: none;
+}
+
 .video-tape__media {
   display: block;
   aspect-ratio: 16 / 10;

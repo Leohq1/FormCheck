@@ -143,25 +143,53 @@ def _primary_pose(poses: list[BackendPose]) -> BackendPose | None:
     return max(enumerate(poses), key=rank)[1]
 
 
+def frame_indexes_for_timestamps(timestamps_ms: Sequence[int], fps: float) -> tuple[int, ...]:
+    """Map output timestamps onto sequentially decoded frame indexes."""
+    if fps <= 0:
+        raise PoseEstimationError("The normalized video could not be read.")
+    indexes: list[int] = []
+    previous = -1
+    for timestamp in timestamps_ms:
+        index = int(round(float(timestamp) * fps / 1000.0))
+        if index < 0:
+            index = 0
+        if index <= previous:
+            index = previous + 1
+        indexes.append(index)
+        previous = index
+    return tuple(indexes)
+
+
 def _read_frames(video_path: Path, timestamps_ms: Sequence[int]) -> list[NDArray[np.uint8] | None]:
     import cv2
 
     capture = cv2.VideoCapture(str(video_path))
     if not capture.isOpened():
         raise PoseEstimationError("The normalized video could not be read.")
-    frames: list[NDArray[np.uint8] | None] = []
+    fps = float(capture.get(cv2.CAP_PROP_FPS) or 0.0)
     try:
-        for timestamp in timestamps_ms:
-            capture.set(cv2.CAP_PROP_POS_MSEC, float(timestamp))
+        indexes = frame_indexes_for_timestamps(timestamps_ms, fps)
+    except PoseEstimationError:
+        capture.release()
+        raise
+    needed = set(indexes)
+    decoded: dict[int, NDArray[np.uint8] | None] = {}
+    frame_index = 0
+    last_needed = max(indexes) if indexes else -1
+    try:
+        while frame_index <= last_needed:
             ok, frame = capture.read()
-            if not ok or frame is None:
-                frames.append(None)
-                continue
-            converted = np.asarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), dtype=np.uint8)
-            frames.append(converted)
+            if frame_index in needed:
+                if not ok or frame is None:
+                    decoded[frame_index] = None
+                else:
+                    decoded[frame_index] = np.asarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB), dtype=np.uint8)
+            if not ok:
+                break
+            frame_index += 1
     finally:
         capture.release()
-    return frames
+    return [decoded.get(index) for index in indexes]
 
 
 def _mediapipe_backend(build: EstimatorBuild) -> PoseBackend:

@@ -19,8 +19,25 @@ class FrameQualityConfig:
 
 def measure_frame_quality(path: object, config: FrameQualityConfig) -> VideoQualitySignals:
     """Read a video when OpenCV can open it. Tests use ``score_frames`` directly."""
-    del path
-    return _unavailable(config, "unreadable_video")
+    try:
+        import cv2
+    except ImportError:
+        return _unavailable(config, "unreadable_video")
+    capture = cv2.VideoCapture(str(path))
+    if not capture.isOpened():
+        return _unavailable(config, "unreadable_video")
+    frames: list[NDArray[np.generic]] = []
+    try:
+        for _ in range(30):
+            ok, frame = capture.read()
+            if not ok or frame is None:
+                break
+            frames.append(frame)
+    finally:
+        capture.release()
+    if len(frames) < config.minimum_frames:
+        return _unavailable(config, "insufficient_frames")
+    return score_frames(frames, config)
 
 
 def score_frames(frames: Sequence[NDArray[np.generic]], config: FrameQualityConfig) -> VideoQualitySignals:

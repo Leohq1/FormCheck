@@ -15,6 +15,7 @@ import SpecularButton, {
 } from '@/components/SpecularButton'
 import { StatusBanner } from '@/components/StatusBanner'
 import { clearAnalysisClip, getAnalysisClip } from '@/lib/clipSession'
+import { referenceClipFor } from '@/sports/config'
 
 export function AnalysisPage() {
   const { analysisId = '' } = useParams()
@@ -170,6 +171,7 @@ export function AnalysisPage() {
         <ResultsPanel
           result={result}
           yourClipUrl={getAnalysisClip(analysisId)}
+          referenceClipUrl={referenceClipFor(result.stroke.type)}
         />
       ) : null}
 

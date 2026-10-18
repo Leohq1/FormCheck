@@ -32,7 +32,12 @@ async function requestJson<T>(
     return undefined as T
   }
 
-  return (await response.json()) as T
+  const body = await response.text()
+  if (!body) {
+    return undefined as T
+  }
+
+  return JSON.parse(body) as T
 }
 
 export function createHttpClient(baseUrl: string): AnalysisApi {
@@ -46,10 +51,18 @@ export function createHttpClient(baseUrl: string): AnalysisApi {
       })
     },
 
-    async uploadFile(uploadUrl: string, file: File, contentType: string) {
-      const response = await fetch(uploadUrl, {
+    async uploadFile(
+      analysisId: string,
+      capabilityToken: string,
+      file: File,
+      contentType: string,
+    ) {
+      const response = await fetch(`${root}/api/v1/analyses/${analysisId}/upload`, {
         method: 'PUT',
-        headers: { 'Content-Type': contentType },
+        headers: {
+          'Content-Type': contentType,
+          Authorization: `Bearer ${capabilityToken}`,
+        },
         body: file,
       })
       if (!response.ok) {

@@ -8,16 +8,14 @@ Date: 2026-10-17. This describes the tree after the coaching merge and the provi
 - `GET /result` returns the ratified result (`schema_version` `"1"`). `FORMCHECK_INTERIM_RESULT_SHIM` has no effect.
 - The upload form and result screen use that same result shape. Empty findings display “No supported fault detected.”
 - `clear.low_arm_extension.v1` stays disabled and uncalibrated. A triggering measurement can appear only in development diagnostics, never as a public finding or coaching fault.
-- The fake worker still returns the schema-valid sample finding used by the HTTP demo. The real `formcheck-analyze` pipeline is provisional and is not wired into Dramatiq. A real pre-calibration run returns `findings: []`.
+- An overhead-clear upload runs the provisional video pipeline in Dramatiq. Public findings stay empty, and the result says no supported fault was detected. Gemini coaching runs only when that result already contains findings. Filenames containing `inconclusive`, `failed`, or `expired`, and smash or drop uploads, still use the scripted fixtures.
 
 ## Still outside this tree
 
 - Consented overhead-clear video (`FORMCHECK_SAMPLE_VIDEO`)
-- MediaPipe Pose Landmarker (`MEDIAPIPE_POSE_MODEL_PATH`)
-- `GEMINI_API_KEY` and `GEMINI_MODEL` for live generation
-- Rights-cleared sources before user-facing citations
 - Coach-labeled calibration and the 0.80 held-out precision gate
-- A Docker run of the Compose stack on this machine
+
+The MediaPipe Pose Landmarker file belongs in `.local/models/` and is mounted into the worker. FFmpeg is installed in the worker image. The CC BY-SA corpus is already stored.
 
 Missing assets or keys skip the asset tests. They do not fail the ordinary unit suite.
 

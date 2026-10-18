@@ -1,5 +1,22 @@
-import type { AnalysisFinding, AnalysisResult, FeedbackTip } from '@/api/types'
+import type { AnalysisResult, FeedbackTip } from '@/api/types'
+import { SkeletonVideo } from '@/components/SkeletonVideo'
 import { formatConfidence } from '@/lib/videoValidation'
+
+const STROKE_LABELS: Record<string, string> = {
+  overhead_clear: 'Overhead clear',
+  smash: 'Smash',
+  drop: 'Drop',
+}
+
+const PHASES = ['Prepare', 'Strike', 'Recover']
+
+function phaseOf(tip: FeedbackTip, index: number): string {
+  const citation = tip.citations[0]
+  if (citation?.source_id === 'stroke-brief' && citation.locator) {
+    return citation.locator
+  }
+  return PHASES[index] ?? 'Cue'
+}
 
 interface ResultsPanelProps {
   result: AnalysisResult
@@ -9,39 +26,21 @@ interface ResultsPanelProps {
   referenceClipUrl?: string | null
 }
 
-interface CoachingItem {
-  finding: AnalysisFinding
-  tip: FeedbackTip | undefined
-  index: number
-}
-
 function VideoTape({
   label,
   src,
-  poster,
 }: {
   label: string
   src?: string | null
-  poster: string
 }) {
   return (
     <figure className="video-tape m-0 min-w-0">
       <div className="video-tape__bezel">
         {src ? (
-          <video
-            className="video-tape__media"
-            controls
-            playsInline
-            preload="metadata"
-            poster={poster}
-            src={src}
-          >
-            <track kind="captions" />
-          </video>
+          <SkeletonVideo src={src} label={label} />
         ) : (
           <div
             className="video-tape__media video-tape__media--empty"
-            style={{ backgroundImage: `url(${poster})` }}
             role="img"
             aria-label={`${label} preview placeholder`}
           >
@@ -60,18 +59,8 @@ export function ResultsPanel({
   referenceClipUrl,
 }: ResultsPanelProps) {
   const overallPercent = Math.round(result.quality.overall * 100)
-
-  const coachingItems: CoachingItem[] = result.findings
-    .slice(0, 3)
-    .map((finding, index) => ({
-      finding,
-      tip: result.feedback.tips.find((tip) => tip.finding_id === finding.rule_id),
-      index,
-    }))
-
-  const orphanTips = result.feedback.tips.filter(
-    (tip) => !result.findings.some((finding) => finding.rule_id === tip.finding_id),
-  )
+  const strokeLabel = STROKE_LABELS[result.stroke.type] ?? 'Selected shot'
+  const tips = result.feedback.tips.slice(0, 3)
 
   return (
     <div className="space-y-10">
@@ -144,141 +133,63 @@ export function ResultsPanel({
             Form comparison
           </h2>
           <p className="text-sm text-[var(--color-muted)]">
-            Your swing beside a reference model of the same stroke.
+            Your swing beside the reference swing, each with a MediaPipe skeleton.
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          <VideoTape
-            label="Your swing"
-            src={yourClipUrl}
-            poster="/images/hero-badminton.jpg"
-          />
-          <VideoTape
-            label="Reference form"
-            src={referenceClipUrl}
-            poster="/images/hero-court.jpg"
-          />
+          <VideoTape label="Your swing" src={yourClipUrl} />
+          <VideoTape label={`Reference ${strokeLabel.toLowerCase()}`} src={referenceClipUrl} />
         </div>
       </section>
 
-      <section className="space-y-4" aria-labelledby="coaching-heading">
-        <h2
-          id="coaching-heading"
-          className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--color-ink)]"
-        >
-          Coaching suggestions
-        </h2>
-        {coachingItems.length === 0 && orphanTips.length === 0 ? (
+      <section className="space-y-5" aria-labelledby="coaching-heading">
+        <div className="space-y-1">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-[var(--color-accent)]">
+            {strokeLabel}
+          </p>
+          <h2
+            id="coaching-heading"
+            className="font-[family-name:var(--font-display)] text-2xl font-semibold text-[var(--color-ink)]"
+          >
+            Practice session
+          </h2>
+        </div>
+        {tips.length === 0 ? (
           <p className="text-[var(--color-muted)]">
-            No supported fault detected — nothing specific to work on for this
-            clip.
+            Coaching for this shot did not come back. Run the analysis again.
           </p>
         ) : (
-          <ul className="m-0 space-y-4 p-0">
-            {coachingItems.map(({ finding, tip, index }) => (
+          <ol className="m-0 grid list-none gap-4 p-0 md:grid-cols-3">
+            {tips.map((tip, index) => (
               <li
-                key={finding.rule_id}
-                className="coach-panel list-none space-y-4 px-5 py-4 sm:px-6 sm:py-5"
+                key={`${tip.finding_id}-${index}`}
+                className="coach-panel flex list-none flex-col gap-4 px-5 py-5"
               >
-                <div className="flex flex-wrap items-baseline justify-between gap-2">
-                  <div className="flex items-baseline gap-3">
-                    <span
-                      className="font-[family-name:var(--font-display)] text-lg font-semibold tabular-nums text-[var(--color-accent)]"
-                      aria-hidden="true"
-                    >
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <h3 className="text-base font-medium text-[var(--color-ink)] sm:text-lg">
-                      {finding.label}
-                    </h3>
-                  </div>
-                  <span className="text-sm text-[var(--color-muted)]">
-                    {finding.severity} · {formatConfidence(finding.confidence)}
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="font-[family-name:var(--font-display)] text-sm font-semibold uppercase tracking-[0.14em] text-[var(--color-accent)]">
+                    {phaseOf(tip, index)}
+                  </span>
+                  <span
+                    className="font-[family-name:var(--font-display)] text-lg font-semibold tabular-nums text-[var(--color-ink)]/35"
+                    aria-hidden="true"
+                  >
+                    {String(index + 1).padStart(2, '0')}
                   </span>
                 </div>
-
-                {finding.evidence.length > 0 ? (
-                  <ul className="m-0 space-y-1.5 p-0 text-sm text-[var(--color-muted)]">
-                    {finding.evidence.map((item) => (
-                      <li
-                        key={`${finding.rule_id}-${item.feature}`}
-                        className="list-none"
-                      >
-                        <span className="font-mono text-xs text-[var(--color-ink)]">
-                          {item.feature}
-                        </span>
-                        : {item.value} {item.unit}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
-
-                {tip ? (
-                  <div className="space-y-3 border-t border-[color-mix(in_srgb,var(--color-border)_55%,transparent)] pt-4">
-                    <h4 className="text-base font-medium text-[var(--color-ink)]">
-                      {tip.title}
-                    </h4>
-                    <p className="max-w-3xl leading-relaxed text-[var(--color-muted)]">
-                      {tip.explanation}
-                    </p>
-                    <p className="max-w-3xl rounded-md bg-[#efefed] px-4 py-3 text-sm leading-relaxed text-[#242e2d]">
-                      <span className="font-medium text-[#242e2d]/70">
-                        Try this —{' '}
-                      </span>
-                      {tip.practice_cue}
-                    </p>
-                    {tip.citations.length > 0 ? (
-                      <ul className="m-0 space-y-1 p-0 text-sm text-[var(--color-muted)]">
-                        {tip.citations.map((cite) => (
-                          <li
-                            key={`${cite.source_id}:${cite.chunk_id}`}
-                            className="list-none"
-                          >
-                            {cite.source_id} — {cite.locator}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                ) : null}
-              </li>
-            ))}
-
-            {orphanTips.map((tip) => (
-              <li
-                key={tip.finding_id}
-                className="coach-panel list-none space-y-3 px-5 py-4 sm:px-6 sm:py-5"
-              >
-                <h3 className="text-lg font-medium text-[var(--color-ink)]">
+                <h3 className="font-[family-name:var(--font-display)] text-xl font-semibold leading-tight text-[var(--color-ink)]">
                   {tip.title}
                 </h3>
-                <p className="max-w-3xl leading-relaxed text-[var(--color-muted)]">
+                <p className="flex-1 text-sm leading-relaxed text-[var(--color-muted)]">
                   {tip.explanation}
                 </p>
-                <p className="max-w-3xl rounded-md bg-[#efefed] px-4 py-3 text-sm leading-relaxed text-[#242e2d]">
-                  <span className="font-medium text-[#242e2d]/70">Try this — </span>
+                <p className="rounded-md bg-[var(--color-accent-soft)] px-4 py-3 text-sm leading-relaxed text-[var(--color-ink)]">
                   {tip.practice_cue}
                 </p>
               </li>
             ))}
-          </ul>
+          </ol>
         )}
       </section>
-
-      {result.feedback.limitations.length > 0 ? (
-        <section className="space-y-2 border-t border-[color-mix(in_srgb,var(--color-border)_70%,transparent)] pt-6">
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold text-[var(--color-ink)]">
-            Limitations
-          </h2>
-          <ul className="m-0 space-y-1.5 p-0 text-sm leading-relaxed text-[var(--color-muted)]">
-            {result.feedback.limitations.map((item) => (
-              <li key={item} className="list-none">
-                {item}
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
     </div>
   )
 }

@@ -76,10 +76,12 @@ services:
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-formcheck}
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-formchecksecret}
       MINIO_BUCKET: ${MINIO_BUCKET:-formcheck}
-      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173}
+      API_CORS_ORIGINS: ${API_CORS_ORIGINS:-http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174}
       CAPABILITY_TOKEN_PEPPER: ${CAPABILITY_TOKEN_PEPPER:-local-dev-pepper-change-me}
       RETENTION_HOURS: ${RETENTION_HOURS:-24}
       PIPELINE_VERSION: ${PIPELINE_VERSION:-2026.10.0}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
     ports:
       - "8000:8000"
     depends_on:
@@ -108,6 +110,11 @@ services:
       RETENTION_HOURS: ${RETENTION_HOURS:-24}
       PIPELINE_VERSION: ${PIPELINE_VERSION:-2026.10.0}
       FAKE_WORKER_STAGE_MS: ${FAKE_WORKER_STAGE_MS:-400}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-}
+      MEDIAPIPE_POSE_MODEL_PATH: /models/pose_landmarker_full.task
+    volumes:
+      - ../../.local/models:/models:ro
     depends_on:
       postgres:
         condition: service_healthy

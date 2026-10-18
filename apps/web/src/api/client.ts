@@ -9,7 +9,8 @@ import type {
 export interface AnalysisApi {
   createAnalysis(request: CreateAnalysisRequest): Promise<CreateAnalysisResponse>
   uploadFile(
-    uploadUrl: string,
+    analysisId: string,
+    capabilityToken: string,
     file: File,
     contentType: string,
   ): Promise<void>

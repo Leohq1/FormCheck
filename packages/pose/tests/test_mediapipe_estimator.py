@@ -10,6 +10,7 @@ from formcheck_pose.mediapipe_estimator import (
     MediaPipePoseEstimator,
     ModelAssetError,
     PoseEstimationError,
+    frame_indexes_for_timestamps,
 )
 from formcheck_pose.models import CANONICAL_LANDMARKS, LandmarkName
 
@@ -38,6 +39,10 @@ def _pose(visibility: float) -> BackendPose:
             for _ in CANONICAL_LANDMARKS
         ]
     )
+
+
+def test_timestamps_map_onto_sequential_frame_indexes() -> None:
+    assert frame_indexes_for_timestamps([0, 17, 33, 50], 60) == (0, 1, 2, 3)
 
 
 def test_missing_model_is_rejected(tmp_path: Path) -> None:

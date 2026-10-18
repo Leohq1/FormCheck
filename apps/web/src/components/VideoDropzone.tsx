@@ -1,9 +1,6 @@
 import { useId, useState, type DragEvent, type ChangeEvent } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { Upload01Icon, Video01Icon } from '@hugeicons/core-free-icons'
-import SpecularButton, {
-  specularGhostLightProps,
-} from '@/components/SpecularButton'
+import { Upload01Icon, Video01Icon } from '@/icons'
 
 interface VideoDropzoneProps {
   file: File | null

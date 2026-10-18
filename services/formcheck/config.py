@@ -16,7 +16,10 @@ class Settings(BaseSettings):
     minio_bucket: str = "formcheck"
     minio_region: str = "us-east-1"
 
-    api_cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
+    api_cors_origins: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,"
+        "http://localhost:5174,http://127.0.0.1:5174"
+    )
     capability_token_pepper: str = "local-dev-pepper-change-me"
     retention_hours: int = 24
     pipeline_version: str = "2026.10.0"
