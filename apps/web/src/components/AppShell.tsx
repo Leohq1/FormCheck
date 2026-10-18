@@ -1,5 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
+import { BrandErrorBoundary } from '@/components/BrandErrorBoundary'
 import { LogoMark } from '@/components/LogoMark'
+import TrueFocus from '@/components/TrueFocus'
 
 export function AppShell() {
   const { pathname } = useLocation()
@@ -32,7 +34,25 @@ export function AppShell() {
             variant={isLanding ? 'light' : 'dark'}
             className="h-8 w-8 shrink-0 sm:h-9 sm:w-9"
           />
-          FormCheck
+          <BrandErrorBoundary fallback={<span>FormCheck</span>}>
+            <TrueFocus
+              className="focus-brand"
+              sentence="Form Check"
+              manualMode
+              focusStyle="brackets"
+              easing="smooth"
+              blurAmount={2.5}
+              focusScale={1.03}
+              unfocusedOpacity={0.75}
+              borderColor={isLanding ? '#ffffff' : '#ae3121'}
+              glowColor={
+                isLanding ? 'rgba(255,255,255,0.35)' : 'rgba(174,49,33,0.35)'
+              }
+              cornerSize={10}
+              borderWidth={2}
+              animationDuration={0.35}
+            />
+          </BrandErrorBoundary>
         </Link>
         <p
           className={

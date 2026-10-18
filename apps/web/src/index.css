@@ -124,3 +124,23 @@ body {
 .tip-stagger > li:nth-child(6) {
   animation-delay: 0.3s;
 }
+
+@keyframes scroll-cue-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+.scroll-cue-bounce {
+  animation: scroll-cue-bounce 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue-bounce {
+    animation: none;
+  }
+}
