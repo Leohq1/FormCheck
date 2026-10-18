@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "analysis-error.schema.json",
+  "title": "AnalysisError",
+  "description": "Safe error payload for API and terminal analysis outcomes. Never include stack traces, provider raw errors, object keys, or capability tokens.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "code",
+    "safe_message",
+    "retryable",
+    "remediation",
+    "correlation_id"
+  ],
+  "properties": {
+    "code": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable machine-readable error code, e.g. POSE_BODY_CROPPED."
+    },
+    "safe_message": {
+      "type": "string",
+      "minLength": 1,
+      "description": "User-facing message with no internal details."
+    },
+    "retryable": {
+      "type": "boolean",
+      "description": "Whether retrying the same upload may succeed."
+    },
+    "remediation": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific recording or retry guidance. Empty when not applicable."
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Support / log correlation identifier (not a capability token)."
+    },
+    "details": {
+      "type": "object",
+      "description": "Optional non-sensitive structured context for clients or support.",
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "code": "POSE_BODY_CROPPED",
+      "safe_message": "The full body was not visible throughout the stroke.",
+      "retryable": false,
+      "remediation": [
+        "Move the camera farther away.",
+        "Keep both feet and the hitting arm in the frame."
+      ],
+      "correlation_id": "corr-019a0000",
+      "details": {
+        "missing_regions": ["ankles"]
+      }
+    }
+  ]
+}

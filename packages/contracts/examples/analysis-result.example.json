@@ -1,0 +1,72 @@
+{
+  "schema_version": "1",
+  "analysis_id": "019a0000-0000-7000-8000-000000000001",
+  "status": "completed",
+  "quality": {
+    "overall": 0.84,
+    "warnings": []
+  },
+  "stroke": {
+    "type": "overhead_clear",
+    "start_time_ms": 4200,
+    "end_time_ms": 7100,
+    "contact_time_ms": 6240,
+    "confidence": 0.78
+  },
+  "findings": [
+    {
+      "rule_id": "clear.low_arm_extension.v1",
+      "label": "Low arm extension at maximum reach",
+      "severity": "moderate",
+      "confidence": 0.81,
+      "evidence": [
+        {
+          "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+          "value": 128,
+          "unit": "deg"
+        }
+      ],
+      "retrieval_tags": [
+        "overhead_clear",
+        "contact_reach",
+        "arm_extension"
+      ]
+    }
+  ],
+  "feedback": {
+    "summary": "The clip suggests the striking arm was short of full extension near the highest wrist height.",
+    "tips": [
+      {
+        "finding_id": "clear.low_arm_extension.v1",
+        "title": "Reach through contact",
+        "explanation": "Practice a longer arm line at the top of the swing so power travels into the racket.",
+        "practice_cue": "Shadow-swing 10 overhead clears focusing on full arm extension at the top.",
+        "citations": [
+          {
+            "source_id": "source-001",
+            "chunk_id": "chunk-014",
+            "locator": "Section 4.2"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "Contact time was estimated from body motion because the racket and shuttle were not tracked."
+    ],
+    "model": "gpt-placeholder",
+    "prompt_version": "1"
+  },
+  "versions": {
+    "pipeline": "2026.10.0",
+    "pose_estimator": "mediapipe-0.10",
+    "feature_schema": "1",
+    "rule_set": "1",
+    "corpus": "1",
+    "embedding": "text-embedding-3-small",
+    "generation": "gpt-placeholder",
+    "result_schema": "1"
+  },
+  "error": null,
+  "completed_at": "2026-10-17T20:01:00Z",
+  "expires_at": "2026-10-18T20:01:00Z"
+}

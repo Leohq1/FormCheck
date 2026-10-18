@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "analysis-result.schema.json",
+  "title": "AnalysisResult",
+  "description": "Produced by Group B, persisted by Person 2, displayed by Person 1. quality/stroke/finding shapes are shared via common.schema.json with analysis-findings.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "analysis_id",
+    "status",
+    "quality",
+    "stroke",
+    "findings",
+    "feedback",
+    "versions",
+    "completed_at",
+    "expires_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1"
+    },
+    "analysis_id": {
+      "$ref": "common.schema.json#/$defs/analysisId"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["completed", "inconclusive", "failed", "expired", "cancelled"]
+    },
+    "quality": {
+      "$ref": "common.schema.json#/$defs/qualityReport"
+    },
+    "stroke": {
+      "$ref": "common.schema.json#/$defs/strokeInfo"
+    },
+    "findings": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "$ref": "common.schema.json#/$defs/finding"
+      },
+      "description": "At most three prioritized findings for completed analyses; empty when inconclusive."
+    },
+    "feedback": {
+      "$ref": "#/$defs/feedback"
+    },
+    "versions": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "required": [
+        "pipeline",
+        "pose_estimator",
+        "feature_schema",
+        "rule_set",
+        "corpus",
+        "embedding",
+        "generation",
+        "result_schema"
+      ],
+      "properties": {
+        "pipeline": { "type": "string" },
+        "pose_estimator": {
+          "type": "string",
+          "description": "Single string combining estimator name and version (ADR 0001)."
+        },
+        "feature_schema": { "type": "string" },
+        "rule_set": { "type": "string" },
+        "corpus": { "type": "string" },
+        "embedding": { "type": "string" },
+        "generation": { "type": "string" },
+        "result_schema": { "type": "string", "const": "1" }
+      }
+    },
+    "error": {
+      "description": "Null only when status is completed. Required (non-null) for inconclusive, failed, expired, and cancelled — inconclusive carries remediation/retake guidance here (ImplementationPlan §8.5).",
+      "oneOf": [
+        { "type": "null" },
+        { "$ref": "analysis-error.schema.json" }
+      ]
+    },
+    "completed_at": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "string", "format": "date-time" }
+      ]
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": { "enum": ["inconclusive", "failed", "expired", "cancelled"] }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": ["error"],
+        "properties": {
+          "error": { "$ref": "analysis-error.schema.json" }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": { "const": "completed" }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "properties": {
+          "error": { "const": null }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "chunk_id", "locator"],
+      "properties": {
+        "source_id": { "type": "string" },
+        "chunk_id": { "type": "string" },
+        "locator": { "type": "string" }
+      }
+    },
+    "tip": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["finding_id", "title", "explanation", "practice_cue", "citations"],
+      "properties": {
+        "finding_id": { "type": "string" },
+        "title": { "type": "string" },
+        "explanation": { "type": "string" },
+        "practice_cue": { "type": "string" },
+        "citations": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/citation" }
+        }
+      }
+    },
+    "feedback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["summary", "tips", "limitations", "model", "prompt_version"],
+      "properties": {
+        "summary": { "type": "string" },
+        "tips": {
+          "type": "array",
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/tip" }
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "model": { "type": "string" },
+        "prompt_version": { "type": "string" }
+      }
+    }
+  },
+  "examples": [
+    {
+      "schema_version": "1",
+      "analysis_id": "019a0000-0000-7000-8000-000000000001",
+      "status": "completed",
+      "quality": {
+        "overall": 0.84,
+        "warnings": []
+      },
+      "stroke": {
+        "type": "overhead_clear",
+        "start_time_ms": 4200,
+        "end_time_ms": 7100,
+        "contact_time_ms": 6240,
+        "confidence": 0.78
+      },
+      "findings": [
+        {
+          "rule_id": "clear.low_arm_extension.v1",
+          "label": "Low arm extension at maximum reach",
+          "severity": "moderate",
+          "confidence": 0.81,
+          "evidence": [
+            {
+              "feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+              "value": 128,
+              "unit": "deg"
+            }
+          ],
+          "retrieval_tags": [
+            "overhead_clear",
+            "contact_reach",
+            "arm_extension"
+          ]
+        }
+      ],
+      "feedback": {
+        "summary": "The clip suggests the striking arm was short of full extension near the highest wrist height.",
+        "tips": [
+          {
+            "finding_id": "clear.low_arm_extension.v1",
+            "title": "Reach through contact",
+            "explanation": "Practice a longer arm line at the top of the swing so power travels into the racket.",
+            "practice_cue": "Shadow-swing 10 overhead clears focusing on full arm extension at the top.",
+            "citations": [
+              {
+                "source_id": "source-001",
+                "chunk_id": "chunk-014",
+                "locator": "Section 4.2"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "Contact time was estimated from body motion because the racket and shuttle were not tracked."
+        ],
+        "model": "gpt-placeholder",
+        "prompt_version": "1"
+      },
+      "versions": {
+        "pipeline": "2026.10.0",
+        "pose_estimator": "mediapipe-0.10",
+        "feature_schema": "1",
+        "rule_set": "1",
+        "corpus": "1",
+        "embedding": "text-embedding-3-small",
+        "generation": "gpt-placeholder",
+        "result_schema": "1"
+      },
+      "error": null,
+      "completed_at": "2026-10-17T20:01:00Z",
+      "expires_at": "2026-10-18T20:01:00Z"
+    }
+  ]
+}

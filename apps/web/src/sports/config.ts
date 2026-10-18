@@ -1,6 +1,6 @@
 export type SportId = 'badminton'
 
-export type StrokeId = 'overhead_clear'
+export type StrokeId = 'clear' | 'smash' | 'drop'
 
 export type Handedness = 'left' | 'right'
 
@@ -25,9 +25,19 @@ export const SPORTS: SportConfig[] = [
     label: 'Badminton',
     strokes: [
       {
-        id: 'overhead_clear',
-        label: 'Overhead clear',
-        description: 'One controlled overhead clear with the full body visible.',
+        id: 'clear',
+        label: 'Clear',
+        description: 'One controlled clear with the full body visible.',
+      },
+      {
+        id: 'smash',
+        label: 'Smash',
+        description: 'One controlled smash with the full body visible.',
+      },
+      {
+        id: 'drop',
+        label: 'Drop',
+        description: 'One controlled drop shot with the full body visible.',
       },
     ],
   },
@@ -35,6 +45,7 @@ export const SPORTS: SportConfig[] = [
 
 export const MVP_SPORT = SPORTS[0]
 export const MVP_STROKE = MVP_SPORT.strokes[0]
+export const STROKE_OPTIONS = MVP_SPORT.strokes
 
 export const VIDEO_CONSTRAINTS = {
   maxSizeBytes: 100 * 1024 * 1024,
@@ -46,7 +57,7 @@ export const VIDEO_CONSTRAINTS = {
 } as const
 
 export const RECORDING_TIPS: string[] = [
-  'Record exactly one overhead clear.',
+  'Record exactly one clip of your swing.',
   'Keep your whole body visible in frame.',
   'Use a side or rear three-quarter camera view.',
   'Prefer 60 frames per second when your device allows it.',

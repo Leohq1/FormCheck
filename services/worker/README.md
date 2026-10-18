@@ -2,6 +2,17 @@
 
 Integration owners: Persons 2, 3, and 4.
 
-Person 2 owns the durable worker framework, queue integration, job retries, cancellation, progress persistence, and storage abstraction. Person 3 owns analysis-stage logic under `services/worker/analysis/`. Person 4 owns coaching-stage logic under `services/worker/coaching/`.
+Person 2 owns durable orchestration in `formcheck/worker/` (Dramatiq broker, fake pipeline, deletion outbox processing).
 
-The worker runs video inspection and normalization, pose estimation, phase detection, feature extraction, rule evaluation, retrieval, and feedback generation. Approved stage inputs and outputs use `packages/contracts`. Before `analysis-findings.schema.json` is approved by both groups, Person 3 uses an internal model marked `schema_version: "0-draft"`; it is not an integration contract.
+- `formcheck.worker.tasks.run_fake_analysis` — accepts a full `AnalysisJob` dict, emits `analysis-progress` events, persists `analysis-result` fixtures validated against `packages/contracts`.
+- `formcheck.worker.tasks.process_deletion` — removes `analyses/{id}/` objects from MinIO.
+
+Person 3 analysis stages and Person 4 coaching stages will replace the fake pipeline without changing the public HTTP API.
+
+Run via Docker Compose (`worker` service) or:
+
+```bash
+cd services
+set PYTHONPATH=.
+dramatiq formcheck.worker.tasks --processes 1 --threads 2
+```

@@ -1,6 +1,6 @@
 # FormCheck
 
-FormCheck is a web application for asynchronous badminton movement analysis. The MVP accepts one overhead-clear video, extracts pose information with MediaPipe, applies rule-based technique checks, and produces coaching feedback grounded in curated sources.
+FormCheck is a web application for asynchronous badminton movement analysis. The MVP accepts one short clip of a clear, smash, or drop, extracts pose information with MediaPipe, applies rule-based technique checks, and produces coaching feedback grounded in curated sources.
 
 ## Architecture
 

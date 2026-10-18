@@ -1,0 +1,43 @@
+{
+  "schema_version": "1",
+  "analysis_id": "019a0000-0000-7000-8000-000000000002",
+  "status": "failed",
+  "quality": {
+    "overall": 0.0,
+    "warnings": []
+  },
+  "stroke": {
+    "type": "overhead_clear",
+    "start_time_ms": null,
+    "end_time_ms": null,
+    "contact_time_ms": null,
+    "confidence": null
+  },
+  "findings": [],
+  "feedback": {
+    "summary": "",
+    "tips": [],
+    "limitations": [],
+    "model": "none",
+    "prompt_version": "1"
+  },
+  "versions": {
+    "pipeline": "2026.10.0",
+    "pose_estimator": "mediapipe-0.10",
+    "feature_schema": "1",
+    "rule_set": "1",
+    "corpus": "1",
+    "embedding": "none",
+    "generation": "none",
+    "result_schema": "1"
+  },
+  "error": {
+    "code": "ANALYSIS_PIPELINE_ERROR",
+    "safe_message": "Something went wrong while analyzing this video. You can try again.",
+    "retryable": true,
+    "remediation": [],
+    "correlation_id": "corr-019a0000"
+  },
+  "completed_at": null,
+  "expires_at": "2026-10-18T20:01:00Z"
+}
