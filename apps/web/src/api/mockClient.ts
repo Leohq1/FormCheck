@@ -98,6 +98,9 @@ export function createMockClient(): AnalysisApi {
       request: CreateAnalysisRequest,
     ): Promise<CreateAnalysisResponse> {
       await delay(200)
+      if (request.stroke !== 'overhead_clear') {
+        throw new Error('Unsupported stroke type')
+      }
       if (!request.consent) {
         throw new Error('Consent is required')
       }
@@ -114,12 +117,16 @@ export function createMockClient(): AnalysisApi {
       })
 
       return {
-        schema_version: '1.0.0',
+        schema_version: '1',
         analysis_id: analysisId,
         capability_token: capabilityToken,
         upload_url: `mock://upload/${analysisId}`,
         status: 'created',
       }
+    },
+
+    async uploadFile(): Promise<void> {
+      await delay(50)
     },
 
     async completeUpload(
@@ -135,7 +142,7 @@ export function createMockClient(): AnalysisApi {
       record.createdAt = Date.now()
 
       return {
-        schema_version: '1.0.0',
+        schema_version: '1',
         analysis_id: analysisId,
         status: 'queued',
       }
@@ -154,7 +161,7 @@ export function createMockClient(): AnalysisApi {
       record.status = status
 
       return {
-        schema_version: '1.0.0',
+        schema_version: '1',
         analysis_id: analysisId,
         status,
         stage: status,
@@ -175,16 +182,12 @@ export function createMockClient(): AnalysisApi {
       if (!record) throw new Error('Not found')
       if (record.deleted) {
         return {
-          ...resultForOutcome(analysisId, 'completed'),
-          status: 'deleted',
-          findings: [],
-          recommendations: [],
-          citations: [],
+          ...resultForOutcome(analysisId, 'failed'),
           error: {
             code: 'ANALYSIS_DELETED',
-            message: 'This analysis was deleted.',
-            retry_may_work: false,
-            recording_remediation: null,
+            safe_message: 'This analysis was deleted.',
+            retryable: false,
+            remediation: [],
             correlation_id: `corr-${analysisId.slice(0, 8)}`,
           },
         }

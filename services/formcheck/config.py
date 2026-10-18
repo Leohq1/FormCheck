@@ -25,9 +25,6 @@ class Settings(BaseSettings):
     upload_url_expires_seconds: int = 900
     # Ratified contract schema_version is "1" (ADR 0001).
     schema_version: str = "1"
-    # Temporary: project ratified results to interim frontend shape on GET /result.
-    # Person 1 should remap apps/web then set FORMCHECK_INTERIM_RESULT_SHIM=0.
-    interim_result_shim: bool = True
     retention_sweep_interval_seconds: int = 300
 
     @property

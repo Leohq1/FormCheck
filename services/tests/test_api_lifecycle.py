@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 CREATE_BODY = {
     "stroke": "overhead_clear",
     "handedness": "right",
@@ -13,12 +15,11 @@ CREATE_BODY = {
 }
 
 
-def test_create_accepts_frontend_clear_and_rejects_unanalyzed_strokes(client):
-    created = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": "clear"})
-    assert created.status_code == 201
-
-    accepted = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": "smash"})
-    assert accepted.status_code == 201
+def test_create_rejects_clear_alias_and_unanalyzed_strokes(client):
+    for stroke in ("clear", "smash", "drop"):
+        created = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": stroke})
+        assert created.status_code == 400
+        assert created.json()["detail"].lower() == "unsupported stroke type"
 
 
 def test_health(client):
@@ -113,6 +114,63 @@ def test_delete_is_idempotent(client, seeded_analysis):
     second = client.delete(f"/api/v1/analyses/{analysis.id}", headers=headers)
     assert first.status_code == 202
     assert second.status_code == 202
+
+
+@pytest.mark.parametrize("stroke", ["clear", "smash", "drop"])
+def test_rejects_unsupported_stroke_type(client, stroke):
+    body = dict(CREATE_BODY)
+    body["stroke"] = stroke
+    res = client.post("/api/v1/analyses", json=body)
+    assert res.status_code == 400
+    assert res.json()["detail"].lower() == "unsupported stroke type"
+
+
+def test_legacy_shim_environment_cannot_change_result(client, seeded_analysis, db_session, monkeypatch):
+    from formcheck.config import get_settings
+    from formcheck.worker.fixtures import completed_result, hours_from_now
+
+    monkeypatch.setenv("FORMCHECK_INTERIM_RESULT_SHIM", "1")
+    monkeypatch.setenv("INTERIM_RESULT_SHIM", "1")
+    get_settings.cache_clear()
+
+    analysis, token = seeded_analysis
+    analysis.status = "completed"
+    analysis.result_json = completed_result(str(analysis.id), hours_from_now(24))
+    db_session.commit()
+
+    res = client.get(
+        f"/api/v1/analyses/{analysis.id}/result",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert res.status_code == 200
+    body = res.json()
+    assert body["schema_version"] == "1"
+    assert body["feedback"]["tips"]
+    assert body["findings"][0]["severity"] == "moderate"
+    assert isinstance(body["findings"][0]["evidence"], list)
+    assert "recommendations" not in body
+    get_settings.cache_clear()
+
+
+def test_result_returns_ratified_feedback_without_shim(client, seeded_analysis, db_session):
+    from formcheck.worker.fixtures import completed_result, hours_from_now
+
+    analysis, token = seeded_analysis
+    analysis.status = "completed"
+    analysis.result_json = completed_result(str(analysis.id), hours_from_now(24))
+    db_session.commit()
+
+    res = client.get(
+        f"/api/v1/analyses/{analysis.id}/result",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert res.status_code == 200
+    body = res.json()
+    assert body["schema_version"] == "1"
+    assert body["feedback"]["tips"]
+    assert body["findings"][0]["severity"] == "moderate"
+    assert isinstance(body["findings"][0]["evidence"], list)
+    assert "recommendations" not in body
 
 
 def test_unknown_analysis_is_not_found(client):

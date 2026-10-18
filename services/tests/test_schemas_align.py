@@ -1,6 +1,5 @@
 """Smoke tests that do not require Docker services."""
 
-from formcheck.compat import to_interim_result
 from formcheck.contract_validate import (
     validate_analysis_job,
     validate_analysis_progress,
@@ -84,10 +83,9 @@ def test_progress_event_schema():
     validate_analysis_progress(event.model_dump())
 
 
-def test_interim_shim_maps_severity_and_feedback():
-    payload = completed_result("11111111-1111-4111-8111-111111111111", hours_from_now(24))
-    interim = to_interim_result(payload)
-    assert interim["findings"][0]["severity"] == "medium"
-    assert isinstance(interim["findings"][0]["evidence"], str)
-    assert interim["recommendations"]
-    assert interim["error"] is None
+def test_settings_ignore_retired_result_shim_flag(monkeypatch):
+    from formcheck.config import Settings
+
+    monkeypatch.setenv("FORMCHECK_INTERIM_RESULT_SHIM", "1")
+    settings = Settings()
+    assert not hasattr(settings, "interim_result_shim")

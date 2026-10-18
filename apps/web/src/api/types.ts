@@ -68,59 +68,95 @@ export interface AnalysisProgress {
   expires_at: string | null
 }
 
-export type FindingSeverity = 'low' | 'medium' | 'high'
+export type ResultStatus =
+  | 'completed'
+  | 'inconclusive'
+  | 'failed'
+  | 'expired'
+  | 'cancelled'
+
+export type FindingSeverity = 'minor' | 'moderate' | 'major'
+
+export interface EvidenceItem {
+  feature: string
+  value: number
+  unit: string
+}
 
 export interface AnalysisFinding {
   rule_id: string
   label: string
   severity: FindingSeverity
   confidence: number
-  evidence: string
-}
-
-export interface CoachingRecommendation {
-  title: string
-  body: string
-  exercise: string | null
-  citation_ids: string[]
+  evidence: EvidenceItem[]
+  retrieval_tags: string[]
 }
 
 export interface Citation {
-  id: string
-  title: string
+  source_id: string
+  chunk_id: string
   locator: string
 }
 
+export interface FeedbackTip {
+  finding_id: string
+  title: string
+  explanation: string
+  practice_cue: string
+  citations: Citation[]
+}
+
+export interface Feedback {
+  summary: string
+  tips: FeedbackTip[]
+  limitations: string[]
+  model: string
+  prompt_version: string
+}
+
 export interface QualityReport {
-  overall: 'acceptable' | 'borderline' | 'poor'
-  notes: string[]
+  overall: number
+  warnings: string[]
+}
+
+export interface StrokeInfo {
+  type: StrokeId
+  start_time_ms: number | null
+  end_time_ms: number | null
+  contact_time_ms: number | null
+  confidence: number | null
+}
+
+export interface ResultVersions {
+  pipeline: string
+  pose_estimator: string
+  feature_schema: string
+  rule_set: string
+  corpus: string
+  embedding: string
+  generation: string
+  result_schema: '1'
 }
 
 export interface AnalysisResult {
-  schema_version: string
+  schema_version: '1'
   analysis_id: string
-  status: AnalysisStatus
-  stroke: StrokeId
+  status: ResultStatus
   quality: QualityReport
-  stroke_confidence: number | null
-  phase_confidence: number | null
+  stroke: StrokeInfo
   findings: AnalysisFinding[]
-  recommendations: CoachingRecommendation[]
-  citations: Citation[]
-  limitations: string[]
-  inconclusive_reason: string | null
-  retake_guidance: string[]
+  feedback: Feedback
+  versions: ResultVersions
   error: AnalysisError | null
   completed_at: string | null
-  expires_at: string | null
-  versions: Record<string, string>
+  expires_at: string
 }
 
 export interface AnalysisError {
   code: string
-  message: string
-  retry_may_work: boolean
-  recording_remediation: string | null
+  safe_message: string
+  retryable: boolean
+  remediation: string[]
   correlation_id: string
 }
 

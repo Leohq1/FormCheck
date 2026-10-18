@@ -268,7 +268,19 @@ Development/evaluation mode may apply a clearly labeled provisional diagnostic t
 
 The result assembler uses separate types for `Finding` and `CandidateRuleEvaluation`. Only enabled, calibrated rules can construct a `Finding`. The production projection removes diagnostics entirely. Person 4 receives the complete production `AnalysisFindings` payload (quality, stroke/phases, features, findings, and versions), but its RAG fault input is derived exclusively from `findings`. Candidate diagnostics cannot be passed to the production serializer or the RAG input adapter.
 
-The candidate remains excluded from `findings` until a coach-reviewed definition and threshold achieve at least 0.80 precision on a held-out labeled set, with supported-view and handedness slices reported. Enabling requires a reviewed configuration/version change, not a runtime flag.
+The current milestone does not calibrate or enable this rule. Public `findings` stay empty, and the result must not tell a user they have a confirmed technique fault. A development diagnostic may be:
+
+```json
+{
+  "rule_id": "clear.low_arm_extension.v1",
+  "enabled": false,
+  "calibration_status": "not_calibrated",
+  "evaluation": "would_trigger",
+  "message": "Candidate evaluation only; not a validated technique finding."
+}
+```
+
+That object stays in development diagnostics. RAG and Gemini must not convert it into coaching advice. They may explain the measured angle or general overhead-clear mechanics as description, not as “you have low arm extension.” Coach-labeled datasets and the 0.80 held-out precision gate are future validation work. Enabling later requires a reviewed configuration change, not a runtime flag and not a demo convenience.
 
 ## 15. `AnalysisFindings` draft output
 
@@ -409,7 +421,7 @@ Missing assets cause explicit pytest skips. Missing required executables may ski
 
 ### Evaluation
 
-`evals/pose/` reports landmark availability and phase/contact-proxy error when labels exist. `evals/rules/` computes per-rule precision, recall, F1, calibration, counts, and relevant slices. No participant media is committed. A golden result is created only after consent, handedness, view, and expected stroke window are reviewed and label provenance is recorded.
+Labeled pose and rule evaluation is future validation work. The current milestone does not require coach labels, a precision report, or an enabled rule. When that future work starts, `evals/pose/` reports landmark availability and phase/contact-proxy error, and `evals/rules/` computes precision, recall, F1, and the 0.80 held-out enablement gate. No participant media is committed.
 
 ## 19. Implementation sessions
 
@@ -424,15 +436,15 @@ Each session begins by listing exact files, tests, assumptions, and unresolved p
 7. **Feature vertical slice:** registry and dominant-elbow-angle feature with unavailable-data behavior.
 8. **Rule vertical slice:** generic rule engine, disabled candidate diagnostics, production-projection isolation.
 9. **Pipeline composition:** provisional ports and local test adapters, progress/cancellation boundaries, development command, provisional findings fixtures. Stop at a Person 2 review gate before production-adapter integration can be declared complete.
-10. **Evaluation and end-to-end readiness:** owned evaluation harnesses, asset skips, setup/run documentation, full verification.
+10. **Uncalibrated end-to-end demonstration:** asset-gated run, setup documentation, and full verification. Public findings stay empty. Labeled evaluation harnesses are future validation work.
 
 Drafting the shared schema is a separately reviewed integration task and is not silently bundled into these sessions.
 
 ## 20. Completion criteria
 
-Before assets and calibration exist, the implementation is ready when all synthetic tests pass, asset-dependent tests skip explicitly, draft outputs validate internally, disabled rules cannot leak into findings, and another developer can install and run the suite from documentation.
+The current milestone is ready when all synthetic tests pass, asset-dependent tests skip explicitly, draft outputs validate internally, the disabled rule cannot leak into public findings, documentation states that technique rules are not yet calibrated, and another developer can install and run the suite from documentation.
 
-With approved local assets, the controlled sample must produce a canonical pose sequence and complete development-mode analysis. With coach labels and cross-group schema approval, production completion additionally requires valid shared-schema output and at least 0.80 held-out precision before any candidate rule is enabled.
+With the consented sample and pose model, the demonstration produces landmarks, quality, stroke and phase estimates, biomechanical measurements, a development-only candidate evaluation, and a schema-valid public result with `findings: []`. Coach-labeled calibration remains future validation work and is not required for this milestone.
 
 ## 21. Builder decisions left intentionally open
 

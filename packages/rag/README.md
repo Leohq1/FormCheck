@@ -11,11 +11,12 @@ The coaching text in `tests/fixtures/` is synthetic. It is not a real coaching a
 Person 4 agrees with the pre-calibration boundary.
 
 - Read `schema_version: "0-draft"` for local fixtures only. Do not call that output shared-schema compliant. Person 4 is the Group B reviewer for the future `packages/contracts/analysis-findings.schema.json`.
-- Create coaching tips only from `findings`. Ignore `features`, quality scores, phase estimates, and any `diagnostics` or `would_trigger` field.
-- The first rule id is `clear.low_arm_extension.v1`, label `Low arm extension at maximum reach`. It stays out of production findings until coach-labeled precision is at least 0.80. Empty `findings` are the expected production payload until then.
+- Create confirmed-fault tips only from `findings`. Ignore candidate `diagnostics` and any `would_trigger` field. Do not convert those diagnostics into coaching advice.
+- When `findings` is empty, feedback may describe a measured angle or general overhead-clear mechanics. Wording stays descriptive or educational. It must not say that the user has low arm extension or another confirmed technique fault.
+- The first rule id is `clear.low_arm_extension.v1`, label `Low arm extension at maximum reach`. It stays disabled and `not_calibrated` in the current milestone. Coach-labeled calibration and the 0.80 precision gate are future validation work. Empty `findings` are the expected public payload. The UI says “No supported fault detected.”
 - Evidence for that rule uses feature `dominant_elbow_angle_at_max_wrist_height_deg` and unit `deg`.
 - Retrieval tags for that rule are `overhead_clear`, `contact_reach`, and `arm_extension`.
-- Severity is `low`, `moderate`, or `high`, and is copied as supplied. Confidence is a separate 0.0–1.0 value. Wording uses "suggests", names the severity, and prints the confidence. A finding below 0.70 is still explained, with an uncertainty limitation. RAG does not drop or strengthen it.
+- Severity is `minor`, `moderate`, or `major`, and is copied as supplied. Confidence is a separate 0.0–1.0 value. Wording uses "suggests", names the severity, and prints the confidence. A finding below 0.70 is still explained, with an uncertainty limitation. RAG does not drop or strengthen it.
 - Quality warnings RAG will turn into limitations: `contact_uncertain`, `uncertain_contact`, `unsupported_view`, `low_pose_confidence`, `body_not_fully_visible`, and `inconclusive_pose`.
 - Empty findings with no inconclusive warning produce "No supported technique fault was found" and no tips. An unsupported view or inconclusive pose produces no tips and does not describe the clear as clean.
 

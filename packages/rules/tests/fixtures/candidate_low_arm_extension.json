@@ -1,0 +1,9 @@
+{
+  "rule_id": "clear.low_arm_extension.v1",
+  "enabled": false,
+  "calibration_status": "not_calibrated",
+  "required_feature": "dominant_elbow_angle_at_max_wrist_height_deg",
+  "threshold": null,
+  "development_threshold_deg": 140.0,
+  "development_threshold_label": "provisional_test_only"
+}

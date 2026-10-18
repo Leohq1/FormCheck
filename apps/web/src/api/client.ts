@@ -8,6 +8,11 @@ import type {
 
 export interface AnalysisApi {
   createAnalysis(request: CreateAnalysisRequest): Promise<CreateAnalysisResponse>
+  uploadFile(
+    uploadUrl: string,
+    file: File,
+    contentType: string,
+  ): Promise<void>
   completeUpload(
     analysisId: string,
     capabilityToken: string,

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 
 StrokeId = Literal["overhead_clear", "smash", "drop"]
 Handedness = Literal["left", "right"]
@@ -53,25 +53,19 @@ TERMINAL_STATUSES = frozenset(
 RESULT_READY_STATUSES = frozenset({"completed", "inconclusive", "failed", "expired"})
 
 
-# --- Public create / upload (frontend request aliases retained) ---
+# --- Public create / upload ---
 
 
 class CreateAnalysisRequest(BaseModel):
-    stroke: StrokeId
+    # Kept as a string so unsupported strokes return a clear rejection
+    # instead of a generic schema error or an analysis job.
+    stroke: str
     handedness: Handedness
     view_hint: ViewHint
     consent: bool
     filename: str = Field(min_length=1, max_length=512)
     content_type: str
     byte_size: int = Field(gt=0)
-
-    @field_validator("stroke", mode="before")
-    @classmethod
-    def accept_frontend_clear_id(cls, value: object) -> object:
-        """The upload form uses clear. Jobs and findings use overhead_clear."""
-        if value == "clear":
-            return "overhead_clear"
-        return value
 
 
 class CreateAnalysisResponse(BaseModel):

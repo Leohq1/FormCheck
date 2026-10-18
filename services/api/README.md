@@ -24,7 +24,7 @@ Create/upload request aliases still match the frontend (`consent`, `byte_size`, 
 
 Persisted **results** and worker **jobs/progress** follow ratified `packages/contracts` (`schema_version: "1"`, `feedback`, numeric quality, structured evidence, `safe_message`/`retryable`/`remediation`).
 
-Temporary: `FORMCHECK_INTERIM_RESULT_SHIM=1` (default) projects GET `/result` to the pre-sign-off frontend shape so Person 1 can remap without breaking demos. Set to `0` after the UI remap.
+`GET /result` returns the ratified contract. The legacy result projection has been removed, and `FORMCHECK_INTERIM_RESULT_SHIM` cannot change the response.
 
 Auth after create: `Authorization: Bearer <capability_token>` (token returned once; only a hash is stored).
 

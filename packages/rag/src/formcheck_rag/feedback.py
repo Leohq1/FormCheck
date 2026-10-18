@@ -13,6 +13,7 @@ _SEVERITY_RANK = {
     "low": 1,
     "minor": 1,
 }
+_ANGLE_FEATURE = "dominant_elbow_angle_at_max_wrist_height_deg"
 _INCONCLUSIVE_WARNINGS = {
     "unsupported_view",
     "low_pose_confidence",
@@ -62,7 +63,15 @@ class FeedbackValidationError(ValueError):
 class TemplateFeedbackGenerator:
     """Deterministic coaching text. A hosted model can replace this later."""
 
-    def generate(self, findings: AnalysisFindings, evidence: list[Chunk]) -> Feedback:
+    def generate(
+        self,
+        findings: AnalysisFindings,
+        evidence: list[Chunk],
+        *,
+        user_facing: bool = False,
+    ) -> Feedback:
+        if user_facing:
+            evidence = [chunk for chunk in evidence if chunk.citation_scope == "user"]
         ordered = sorted(
             findings.findings,
             key=lambda finding: (_SEVERITY_RANK.get(finding.severity, 0), finding.confidence),
@@ -148,11 +157,27 @@ def _summary(findings: AnalysisFindings, ordered: list[Finding]) -> str:
         return f"The clip suggests {labels}."
     warnings = set(_warnings(findings))
     if "unsupported_view" in warnings:
-        return "This camera view did not support a technique finding."
-    if warnings & _INCONCLUSIVE_WARNINGS:
-        return "This clip did not produce a supported technique finding."
-    stroke = str(findings.stroke.get("type") or "overhead_clear").replace("_", " ")
-    return f"No supported technique fault was found for this {stroke}."
+        base = "This camera view did not support a technique finding."
+    elif warnings & _INCONCLUSIVE_WARNINGS:
+        base = "This clip did not produce a supported technique finding."
+    else:
+        stroke = str(findings.stroke.get("type") or "overhead_clear").replace("_", " ")
+        base = f"No supported technique fault was found for this {stroke}."
+    measured = _measured_angle(findings)
+    if measured is None:
+        return base
+    return f"{base} {measured}"
+
+
+def _measured_angle(findings: AnalysisFindings) -> str | None:
+    for feature in findings.features:
+        if feature.name != _ANGLE_FEATURE or not feature.available or feature.value is None:
+            continue
+        return (
+            f"The measured dominant elbow angle at maximum wrist height was {feature.value:g} degrees. "
+            "This describes the arm position. It is not a validated technique finding."
+        )
+    return None
 
 
 def _warnings(findings: AnalysisFindings) -> list[str]:

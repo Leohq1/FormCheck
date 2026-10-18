@@ -30,4 +30,6 @@ test('guidance to upload to results happy path', async ({ page }) => {
   ).toBeVisible({ timeout: 15_000 })
   await expect(page.getByText(/what to work on/i)).toBeVisible()
   await expect(page.getByText(/coaching suggestions/i)).toBeVisible()
+  await expect(page.getByText(/reach through contact/i)).toBeVisible()
+  await expect(page.getByText(/128 deg/i)).toBeVisible()
 })

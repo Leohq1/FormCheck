@@ -1,7 +1,6 @@
 from pathlib import Path
 
 import pytest
-
 from formcheck_rag.chunking import chunk_document
 from formcheck_rag.feedback import (
     FeedbackValidationError,
@@ -64,6 +63,15 @@ def test_validator_rejects_a_tip_for_a_finding_the_rules_did_not_supply():
 
     with pytest.raises(FeedbackValidationError):
         validate_feedback(feedback, findings, evidence)
+
+
+def test_user_facing_mode_does_not_cite_the_test_corpus():
+    findings = _findings()
+    evidence = _index().search_findings(findings)
+    feedback = TemplateFeedbackGenerator().generate(findings, evidence, user_facing=True)
+
+    assert feedback.tips == []
+    assert any("no approved coaching passage" in item.lower() for item in feedback.limitations)
 
 
 def test_missing_passages_do_not_invent_a_recommendation():

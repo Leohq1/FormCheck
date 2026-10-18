@@ -21,6 +21,7 @@ class Chunk(BaseModel):
     skill_level: str
     page_locator: str
     review_status: str
+    citation_scope: str = "test"
     corpus_version: str
     relevance_score: float = 0.0
 
@@ -48,6 +49,7 @@ def chunk_document(text: str, source: SourceManifest, corpus_version: str) -> li
                     skill_level=source.skill_level,
                     page_locator=source.page_locator,
                     review_status=source.review_status,
+                    citation_scope=source.citation_scope,
                     corpus_version=corpus_version,
                 )
             )

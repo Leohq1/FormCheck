@@ -877,7 +877,7 @@ Initial rule candidates:
 - Abbreviated follow-through
 - Unstable balance
 
-A candidate rule must not be enabled merely because it sounds biomechanically reasonable. It must pass evaluation against coach-labeled videos.
+A candidate rule must not be enabled merely because it sounds biomechanically reasonable. Coach-labeled evaluation is future validation work and is not part of the current milestone. The current milestone keeps `clear.low_arm_extension.v1` disabled and uncalibrated. Its public `findings` array stays empty. A development diagnostic may report `would_trigger` with the message “Candidate evaluation only; not a validated technique finding.” That diagnostic must not appear in the public result or become coaching advice.
 
 ### 6.12 Output contract
 
@@ -966,8 +966,8 @@ Implementation may begin without evaluation media, but end-to-end and rule-enabl
 - The team supplies at least one consented overhead-clear sample video through a local path named by `FORMCHECK_SAMPLE_VIDEO`. Participant videos must not be committed.
 - The MediaPipe model is obtained through a documented setup script or manual download and referenced by `MEDIAPIPE_POSE_MODEL_PATH`. Model binaries must not be committed unless licensing and repository policy are explicitly approved. Record the expected model filename, upstream URL, license, version, and SHA-256 checksum in setup documentation.
 - When either asset is absent, asset-dependent tests must skip with a clear reason. Unit tests using synthetic landmarks and metadata must still run.
-- A coach-labeled dataset is required before enabling any production fault rule. Until it exists and the rule reaches at least 0.80 precision on the held-out labeled set, the rule remains `candidate` with `enabled: false`.
-- A golden expected result is created only after the sample video's consent, view, handedness, and expected stroke window have been reviewed. It must record who labeled it and which pipeline version produced it.
+- Coach-labeled datasets, golden fault labels, and the 0.80 held-out precision gate are future validation work. They are not required to finish the current milestone. Until that work is done, every technique rule remains `candidate` with `enabled: false` and `calibration_status: not_calibrated`.
+- The current demonstration may show measured features and development-only candidate diagnostics. The public result stays schema-valid with `findings: []`, and the interface states that no supported fault was detected.
 
 ### 6.16 Acceptance criteria
 
@@ -979,7 +979,7 @@ Person 3’s work is complete when:
 - Left- and right-handed normalization is tested.
 - Scale and translation invariance are tested.
 - Every finding identifies its rule, evidence, confidence, and version.
-- Rules meet the agreed precision threshold before being enabled.
+- Technique rules are documented as not yet calibrated. No rule is enabled, and public findings stay empty. The 0.80 held-out precision gate remains future validation work.
 - Person 4 can generate feedback without reading raw pose files.
 
 ---

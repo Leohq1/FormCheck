@@ -13,7 +13,6 @@ from sqlalchemy.orm import Session
 
 from formcheck.api.deps import get_analysis_for_token, get_analysis_for_token_including_deleted
 from formcheck.auth import generate_capability_token, hash_capability_token
-from formcheck.compat import to_interim_result
 from formcheck.config import get_settings
 from formcheck.contract_validate import (
     format_validation_error,
@@ -56,6 +55,8 @@ def _iso(dt: datetime | None) -> str | None:
 
 def _validate_create(body: CreateAnalysisRequest) -> None:
     settings = get_settings()
+    if body.stroke != "overhead_clear":
+        raise HTTPException(status_code=400, detail="Unsupported stroke type")
     if not body.consent:
         raise HTTPException(status_code=400, detail="Consent is required")
     if body.byte_size > settings.max_upload_bytes:
@@ -250,7 +251,6 @@ def get_analysis(
 def get_result(
     analysis: Analysis = Depends(get_analysis_for_token),
 ) -> dict[str, Any]:
-    settings = get_settings()
     now = _utc_now()
     expires = analysis.expires_at
     if expires.tzinfo is None:
@@ -274,11 +274,7 @@ def get_result(
             detail="Stored result failed contract validation",
         ) from exc
 
-    # Always ensure Pydantic ratified model accepts the payload.
     AnalysisResult.model_validate(payload)
-
-    if settings.interim_result_shim:
-        return to_interim_result(payload)
     return payload
 
 

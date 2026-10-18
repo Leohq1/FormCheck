@@ -20,8 +20,9 @@
 - Do not import MinIO, Redis, Dramatiq, API code, database models, or Person 2 internals.
 - Relative pose z is non-metric and is not used by the first feature or rule.
 - Missing or unreliable measurements remain unavailable; never interpolate across long occlusions or invent values.
-- Production `findings` may contain only enabled, calibrated rules; diagnostics are development/evaluation-only and must be absent from production serialization.
-- `clear.low_arm_extension.v1` remains disabled and `not_calibrated` until held-out coach-labeled precision is at least `0.80`.
+- Production `findings` may contain only enabled, calibrated rules. The current milestone has none. Diagnostics are development-only and must be absent from the public result.
+- `clear.low_arm_extension.v1` stays `enabled: false` and `calibration_status: not_calibrated` for this milestone. Coach-labeled calibration and the `0.80` held-out precision gate are future validation work. Do not enable the rule to make a demo produce a finding.
+- Public `findings` stay `[]`. The UI says “No supported fault detected.” RAG and Gemini must not convert `would_trigger` into coaching advice. Descriptive or educational wording about a measured angle or general overhead-clear mechanics is allowed; “you have low arm extension” is not.
 - Shared `analysis-findings.schema.json` drafting is not part of this plan; it requires separate cross-group review.
 - Provisional worker ports require Person 2 approval before production adapters or complete worker integration may be claimed.
 - Begin each task/session by restating its exact files, tests, assumptions, and unresolved points; stop after its commit and review.
@@ -607,17 +608,11 @@ Review gate: Person 2 must approve port signatures before production adapters ar
 
 ---
 
-### Task 10: Evaluation Harnesses, Asset-Gated End-to-End Test, and Run Documentation
+### Task 10: Asset-Gated End-to-End Demonstration and Run Documentation
+
+Coach-labeled pose and rule evaluation harnesses are future validation work. This task does not build them and does not enable a rule. The current demonstration asserts `findings == []` and keeps any `would_trigger` result in development diagnostics only.
 
 **Files:**
-- Create: `evals/pose/formcheck_pose_eval/__init__.py`
-- Create: `evals/pose/formcheck_pose_eval/metrics.py`
-- Create: `evals/pose/tests/test_metrics.py`
-- Create: `evals/pose/README.md`
-- Create: `evals/rules/formcheck_rule_eval/__init__.py`
-- Create: `evals/rules/formcheck_rule_eval/metrics.py`
-- Create: `evals/rules/tests/test_metrics.py`
-- Create: `evals/rules/README.md`
 - Create: `services/worker/analysis/tests/test_end_to_end_assets.py`
 - Create: `services/worker/analysis/README.md`
 - Modify: `pyproject.toml`
@@ -625,57 +620,41 @@ Review gate: Person 2 must approve port signatures before production adapters ar
 
 **Interfaces:**
 - Consumes: Completed local pipeline and domain outputs.
-- Produces: Pose/phase metrics, rule precision/recall/F1 metrics, documented local execution, and an asset-gated end-to-end test.
+- Produces: Documented local execution and an asset-gated end-to-end test whose public findings are empty.
 
-- [ ] **Step 1: Write failing pose-evaluation metric tests**
-
-Assert landmark availability rate, absolute phase timing error, median contact-proxy error, within-150-ms rate, empty-label behavior, and grouped output by handedness/view without storing media.
-
-- [ ] **Step 2: Implement pose evaluation metrics**
-
-Accept de-identified label/prediction records; return typed/JSON-serializable metric summaries with counts and version identifiers.
-
-- [ ] **Step 3: Write failing rule-evaluation metric tests**
-
-Assert precision, recall, F1, confusion counts, no-positive-denominator behavior, per-view/handedness slices, and `eligible_for_enablement` only when held-out precision is at least `0.80` with nonzero labeled support.
-
-- [ ] **Step 4: Implement rule evaluation metrics**
-
-Do not mutate rule configuration or enable a rule automatically; report eligibility evidence only.
-
-- [ ] **Step 5: Write the asset-gated end-to-end test**
+- [ ] **Step 1: Write the asset-gated end-to-end test**
 
 Require both environment variables plus FFmpeg/ffprobe. Skip once with a message listing every missing requirement. When available, run local development mode and assert: valid `0-draft` output, canonical pose metadata, quality/stroke/features present when eligible, `findings == []`, and any candidate evaluation is disabled/non-calibrated and exists only in development output.
 
-- [ ] **Step 6: Document setup and commands**
+- [ ] **Step 2: Document setup and commands**
 
 Document uv setup, FFmpeg requirement, environment variables, test markers, expected skips, CLI examples, output separation, current uncalibrated limitations, and the Person 2 review gate. Do not claim end-to-end success without actual assets.
 
-- [ ] **Step 7: Run complete verification**
+- [ ] **Step 3: Run complete verification**
 
 Run:
 
 ```powershell
 uv lock --check
 uv sync --locked --all-groups
-uv run --locked ruff check packages services/worker/analysis evals/pose evals/rules
-uv run --locked mypy packages/video/formcheck_video packages/pose/formcheck_pose packages/biomechanics/formcheck_biomechanics packages/rules/formcheck_rules services/worker/analysis/formcheck_analysis evals/pose/formcheck_pose_eval evals/rules/formcheck_rule_eval
-uv run --locked pytest packages/video/tests packages/pose/tests packages/biomechanics/tests packages/rules/tests services/worker/analysis/tests evals/pose/tests evals/rules/tests -v -ra
+uv run --locked ruff check packages services/worker/analysis
+uv run --locked mypy packages/video/formcheck_video packages/pose/formcheck_pose packages/biomechanics/formcheck_biomechanics packages/rules/formcheck_rules services/worker/analysis/formcheck_analysis
+uv run --locked pytest packages/video/tests packages/pose/tests packages/biomechanics/tests packages/rules/tests services/worker/analysis/tests -v -ra
 git diff --check
 ```
 
 Expected without assets: lint/type checks PASS; all synthetic tests PASS; asset tests SKIP with explicit reasons; no failures.
 
-- [ ] **Step 8: Inspect scope and tracked artifacts**
+- [ ] **Step 4: Inspect scope and tracked artifacts**
 
 Run: `git status --short` and `git diff --name-only HEAD~10..HEAD` (or the actual task commit range).  
 Expected: only authorized paths/files; no video, model, pose, `.local` asset, or generated analysis artifact is tracked.
 
-- [ ] **Step 9: Commit the evaluation/readiness session**
+- [ ] **Step 5: Commit the demonstration session**
 
 ```powershell
-git add evals/pose evals/rules services/worker/analysis pyproject.toml uv.lock
-git commit -m "test: add person 3 evaluation and e2e readiness"
+git add services/worker/analysis pyproject.toml uv.lock
+git commit -m "test: add uncalibrated analysis demonstration"
 ```
 
 Final review gates:
@@ -683,6 +662,6 @@ Final review gates:
 - Cross-group review of root Python configuration.
 - Person 2 approval of provisional worker ports before production adapters.
 - Group A plus Group B approval of the future shared findings schema.
-- Coach-labeled held-out evaluation before enabling any production rule.
 - Asset-backed end-to-end evidence before claiming the sample-video flow works.
+- Technique rules remain explicitly uncalibrated. Enabling a rule is future validation work.
 

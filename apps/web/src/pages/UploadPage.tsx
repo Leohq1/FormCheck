@@ -47,6 +47,11 @@ export function UploadPage() {
       })
 
       storeCapabilityToken(created.analysis_id, created.capability_token)
+      await api.uploadFile(
+        created.upload_url,
+        file!,
+        file!.type || 'video/mp4',
+      )
       await api.completeUpload(created.analysis_id, created.capability_token)
       return created.analysis_id
     },

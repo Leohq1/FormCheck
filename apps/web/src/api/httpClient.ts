@@ -1,5 +1,4 @@
 import type { AnalysisApi } from '@/api/client'
-import { normalizeResult } from '@/api/normalizeResult'
 import type {
   AnalysisProgress,
   AnalysisResult,
@@ -47,6 +46,17 @@ export function createHttpClient(baseUrl: string): AnalysisApi {
       })
     },
 
+    async uploadFile(uploadUrl: string, file: File, contentType: string) {
+      const response = await fetch(uploadUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': contentType },
+        body: file,
+      })
+      if (!response.ok) {
+        throw new Error(`Upload failed (${response.status})`)
+      }
+    },
+
     completeUpload(analysisId: string, capabilityToken: string) {
       return requestJson<CompleteUploadResponse>(
         root,
@@ -63,13 +73,12 @@ export function createHttpClient(baseUrl: string): AnalysisApi {
       )
     },
 
-    async getResult(analysisId: string, capabilityToken: string) {
-      const payload = await requestJson<AnalysisResult>(
+    getResult(analysisId: string, capabilityToken: string) {
+      return requestJson<AnalysisResult>(
         root,
         `/api/v1/analyses/${analysisId}/result`,
         { capabilityToken },
       )
-      return normalizeResult(payload)
     },
 
     async deleteAnalysis(analysisId: string, capabilityToken: string) {

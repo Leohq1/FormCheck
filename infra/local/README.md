@@ -2,11 +2,21 @@
 
 Owner: Person 2 for the API, Redis, and object-storage stack. Person 4's coaching tables are created from `init/` the first time the Postgres volume is empty.
 
-The database image is `pgvector/pgvector:pg16`, which is the official Postgres image with the pgvector extension. The local username, password, and database name are all `formcheck`. This password is for the local container only.
+This Compose file starts the local FormCheck stack:
 
-Open a terminal in `infra/local` and use these commands.
+- PostgreSQL 16 with pgvector (`formcheck` / `formcheck` / database `formcheck`)
+- Redis
+- S3-compatible object storage (`pgsty/silo`, API port 9000, console port 9001)
+- the API on port 8000
+- the Dramatiq worker
 
-Start the database and wait until it is ready:
+The first time the Postgres volume is empty, `init/001-coaching.sql` creates the `vector` extension and the coaching tables. Copy `.env.example` to `.env` when you need to override the local defaults. `GET /result` always returns the ratified contract. The retired `FORMCHECK_INTERIM_RESULT_SHIM` variable has no effect.
+
+This Compose file is configured and has not been started on the machine that last edited it. Docker was not available there, so the stack is runtime-unverified until someone with Docker runs `docker compose up`.
+
+Open a terminal in `infra/local`.
+
+Start the stack and wait until it is ready:
 
 ```text
 docker compose up -d
@@ -20,19 +30,15 @@ docker compose exec postgres psql -U formcheck -d formcheck -c "SELECT extname, 
 docker compose exec postgres psql -U formcheck -d formcheck -c "\dt"
 ```
 
-Stop the database. The saved data remains:
+API docs: `http://localhost:8000/docs`
+
+Stop the stack. Saved data remains:
 
 ```text
 docker compose stop
 ```
 
-Start it again later:
-
-```text
-docker compose start
-```
-
-Stop it and delete the saved data:
+Stop it and delete saved data:
 
 ```text
 docker compose down -v

@@ -16,7 +16,7 @@ The first release will:
 - Run locally first and move to cloud hosting only after evaluation targets pass.
 - Keep professional-movement similarity, multi-camera analysis, and live feedback outside the MVP.
 
-The first complete analysis target is one controlled stroke video (clear, smash, or drop), one trustworthy feature, one rule-produced finding, one retrieved coaching passage, and one result displayed in the web application.
+The current milestone analyzes one consented overhead clear and displays a schema-valid result. Public `findings` stay empty because technique rules are not calibrated. The pipeline may report measured features and development-only candidate diagnostics. A confirmed technique finding is future validation work, not part of this milestone.
 
 ## 2 Team organization
 
@@ -370,7 +370,11 @@ Begin with dominant-elbow angle at maximum dominant-wrist height as a camera-obs
 - Do not infer a value across long occlusions.
 - Do not fire a rule when required feature confidence is too low.
 - Do not rely on a language model to decide whether a fault exists.
-- Do not enable a rule until it reaches at least 0.80 precision on a held-out coach-labeled set.
+- Do not enable a rule in the current milestone. `clear.low_arm_extension.v1` stays `enabled: false` and `calibration_status: not_calibrated`.
+- Public `findings` stay empty. The result must not tell a user they have a confirmed technique fault. The UI says “No supported fault detected.”
+- Candidate output may say `would_trigger` only in development diagnostics. That diagnostic is omitted from the public result.
+- RAG and Gemini must not turn a candidate diagnostic into coaching advice. They may describe a measured angle or general overhead-clear mechanics in educational wording. They must not say that the user has low arm extension.
+- Coach-labeled calibration is future validation work. A rule may be enabled only after a later milestone reaches at least 0.80 precision on a held-out coach-labeled set and a person approves the change. Do not enable a rule to make a demo produce a finding.
 
 ### Person 3 completion criteria
 
@@ -481,7 +485,11 @@ PoseSequence
 
 ### Milestone E — Full integration
 
-Replace the fake worker with the real analysis pipeline without changing the public API or frontend business logic.
+Replace the fake worker with the real analysis pipeline without changing the public API or frontend business logic. The current milestone stops at an uncalibrated demonstration: landmarks, quality, stroke and phase estimates, biomechanical measurements, a disabled candidate evaluation, and a public result with `findings: []`.
+
+### Future validation
+
+Coach-labeled development and held-out sets, the 0.80 precision gate, and enabling `clear.low_arm_extension.v1` are outside the current milestone. Until that future work is accepted, documentation and the product must state that technique rules are not yet calibrated.
 
 ## 12 Decisions intentionally deferred
 
@@ -497,6 +505,7 @@ Do not block the MVP on:
 - Saved progress
 - Mobile applications
 - A separate managed vector database
+- Coach-labeled calibration and enabling `clear.low_arm_extension.v1`
 
 Each deferred item requires its own evidence and acceptance criteria before entering the MVP.
 

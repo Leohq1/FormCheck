@@ -8,7 +8,7 @@
     {
       "rule_id": "clear.low_arm_extension.v1",
       "label": "Low arm extension at maximum reach",
-      "severity": "low",
+      "severity": "minor",
       "confidence": 0.42,
       "evidence": [
         {

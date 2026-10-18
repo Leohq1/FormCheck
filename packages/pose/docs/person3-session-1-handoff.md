@@ -129,8 +129,8 @@ Observed result at handoff:
 - Normalization emits H.264/AVC `yuv420p`, 60 fps for source rates at least 50 fps and otherwise 30 fps, with even dimensions, rotation applied, audio removed, and timestamps rebased.
 - Each normalized output frame maps to the nearest decoded source PTS; ties choose the earlier timestamp.
 - The first feature is `dominant_elbow_angle_at_max_wrist_height_deg`.
-- `clear.low_arm_extension.v1` remains disabled and `not_calibrated`.
-- Development diagnostics may say `would_trigger`; production `findings` remains empty until a rule reaches at least 0.80 held-out coach-labeled precision.
+- `clear.low_arm_extension.v1` remains disabled and `not_calibrated` for the current milestone.
+- Development diagnostics may say `would_trigger`. Public `findings` stay empty. Coach-labeled calibration and the 0.80 precision gate are future validation work. Do not enable the rule to produce a demo finding.
 - Production serialization excludes candidate diagnostics structurally.
 - Until cross-group schema approval, internal output uses `schema_version: "0-draft"`.
 
@@ -159,9 +159,9 @@ Production worker integration is not complete until Person 2 approves the ports.
 
 ## Person 4 integration boundary
 
-Person 4 receives production `AnalysisFindings` containing quality, stroke/phases, features, findings, and versions. Person 4's RAG pipeline derives faults only from `findings`; it may use quality/phase limitations to qualify wording but may not infer faults from features.
+Person 4 receives production `AnalysisFindings` containing quality, stroke/phases, features, findings, and versions. Confirmed faults come only from `findings`. With findings empty, RAG may explain a measured angle or general overhead-clear mechanics in educational wording. It must not say the user has low arm extension or any other confirmed technique fault.
 
-Candidate diagnostics are never sent to Person 4. Empty findings is a valid result and must not cause invented coaching advice. Person 4 should review finding IDs/labels, evidence units, retrieval tags, severity/confidence semantics, limitation fields, empty-findings behavior, and the future shared schema as the Group B reviewer.
+Candidate diagnostics are never sent to Person 4 and must not become coaching advice. Empty findings is the expected current-milestone result. The UI says “No supported fault detected.” Person 4 should review finding IDs/labels, evidence units, retrieval tags, severity/confidence semantics, limitation fields, empty-findings behavior, and the future shared schema as the Group B reviewer.
 
 ## Review gates still open
 
@@ -170,7 +170,7 @@ Candidate diagnostics are never sent to Person 4. Empty findings is a valid resu
 3. Task 4 validation that MediaPipe inference works with the sole headless OpenCV provider.
 4. Person 2 approval of provisional worker ports before production adapters.
 5. Group A and Group B approval of the future `analysis-findings.schema.json`.
-6. Coach-labeled evaluation before enabling any production rule.
+6. Future validation: coach-labeled evaluation before any later milestone enables a production rule. The current milestone does not include that evaluation.
 
 ## Next step
 

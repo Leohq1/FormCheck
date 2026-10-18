@@ -25,6 +25,12 @@ class SourceManifest(BaseModel):
     review_date: str
     content_hash: str
     text_file: str | None = None
+    citation_scope: str = "test"
+    canonical_location: str | None = None
+    retrieved_on: str | None = None
+
+    def allows_user_facing_citation(self) -> bool:
+        return self.review_status == "approved" and self.citation_scope == "user" and bool(self.license)
 
 
 def load_manifest(path: Path) -> list[SourceManifest]:

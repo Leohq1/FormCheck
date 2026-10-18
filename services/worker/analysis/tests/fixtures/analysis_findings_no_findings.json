@@ -1,0 +1,46 @@
+{
+  "schema_version": "0-draft",
+  "analysis_id": "11111111-1111-4111-8111-111111111111",
+  "quality": {
+    "overall": 0.8,
+    "eligible": true,
+    "disposition": "eligible",
+    "warnings": [],
+    "remediation": [],
+    "components": [],
+    "version": "quality.v1-provisional"
+  },
+  "stroke": null,
+  "phases": null,
+  "features": [
+    {
+      "name": "dominant_elbow_angle_at_max_wrist_height_deg",
+      "value": 128.0,
+      "unit": "deg",
+      "confidence": 0.81,
+      "available": true,
+      "feature_version": "1",
+      "unavailable_reason": null
+    }
+  ],
+  "findings": [],
+  "versions": {
+    "pipeline": "2026.10.0",
+    "pose_estimator": "mediapipe-pose-landmarker",
+    "feature_schema": "1",
+    "rule_set": "clear.low_arm_extension.v1"
+  },
+  "diagnostics": {
+    "candidate_rule_evaluations": [
+      {
+        "rule_id": "clear.low_arm_extension.v1",
+        "enabled": false,
+        "calibration_status": "not_calibrated",
+        "evaluation": "would_trigger",
+        "message": "Candidate evaluation only; not a validated technique finding."
+      }
+    ]
+  },
+  "handedness": "right",
+  "view_hint": "rear_three_quarter"
+}

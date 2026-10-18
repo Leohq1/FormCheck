@@ -154,22 +154,22 @@ export function AnalysisPage() {
       {result.status === 'inconclusive' ? (
         <div className="space-y-4">
           <StatusBanner tone="warning" title="Could not analyze this clip safely">
-            {result.inconclusive_reason}
+            {result.error?.safe_message}
           </StatusBanner>
-          {result.quality.notes.length > 0 ? (
+          {result.quality.warnings.length > 0 ? (
             <ul className="list-disc space-y-1 pl-5 text-[var(--color-muted)]">
-              {result.quality.notes.map((note) => (
-                <li key={note}>{note}</li>
+              {result.quality.warnings.map((warning) => (
+                <li key={warning}>{warning}</li>
               ))}
             </ul>
           ) : null}
-          {result.retake_guidance.length > 0 ? (
+          {result.error && result.error.remediation.length > 0 ? (
             <div className="space-y-2">
               <h2 className="font-[family-name:var(--font-display)] text-xl font-medium">
                 How to re-record
               </h2>
               <ul className="list-disc space-y-1 pl-5 text-[var(--color-muted)]">
-                {result.retake_guidance.map((tip) => (
+                {result.error.remediation.map((tip) => (
                   <li key={tip}>{tip}</li>
                 ))}
               </ul>
@@ -184,14 +184,18 @@ export function AnalysisPage() {
       {result.status === 'failed' && result.error ? (
         <div className="space-y-4">
           <StatusBanner tone="danger" title="Analysis failed" role="alert">
-            <p>{result.error.message}</p>
+            <p>{result.error.safe_message}</p>
             <p className="mt-2">
-              {result.error.retry_may_work
+              {result.error.retryable
                 ? 'Retrying with the same video may work.'
                 : 'A new recording is recommended.'}
             </p>
-            {result.error.recording_remediation ? (
-              <p className="mt-2">{result.error.recording_remediation}</p>
+            {result.error.remediation.length > 0 ? (
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                {result.error.remediation.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             ) : null}
             <p className="mt-2 font-mono text-xs">
               Support ID: {result.error.correlation_id}
@@ -206,7 +210,7 @@ export function AnalysisPage() {
       {result.status === 'expired' ? (
         <div className="space-y-4">
           <StatusBanner tone="warning" title="This analysis has expired">
-            {result.error?.message ??
+            {result.error?.safe_message ??
               'Results are removed after 24 hours. Upload a new clip to continue.'}
           </StatusBanner>
           <Link to="/upload" className="btn-primary">

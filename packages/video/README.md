@@ -28,3 +28,5 @@ analyses/{analysis_id}/normalized/timestamps.json
 - Results record source and output hashes, media metadata, logical object keys, FFmpeg version, and contract version.
 
 Normalization does not claim to create motion detail absent from the source.
+
+Synthetic tests build ffprobe output and NumPy frames. A real overhead-clear file is optional: set `FORMCHECK_SAMPLE_VIDEO` to run `packages/video/tests/test_video_assets.py`. When that variable is unset or does not point to a file, the test skips with `FORMCHECK_SAMPLE_VIDEO is not set or does not point to a file`. FFmpeg and ffprobe are invoked with argument lists and `shell=False`.

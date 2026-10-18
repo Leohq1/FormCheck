@@ -22,7 +22,7 @@
     {
       "rule_id": "clear.limited_trunk_rotation.v1",
       "label": "Limited trunk rotation",
-      "severity": "low",
+      "severity": "minor",
       "confidence": 0.74,
       "evidence": [
         { "feature": "shoulder_hip_separation_deg", "value": 12, "unit": "deg" }

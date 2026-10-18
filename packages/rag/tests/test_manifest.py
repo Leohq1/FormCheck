@@ -2,9 +2,8 @@ import json
 from pathlib import Path
 
 import pytest
-from pydantic import ValidationError
-
 from formcheck_rag.manifest import load_manifest
+from pydantic import ValidationError
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -18,6 +17,7 @@ def test_load_manifest_accepts_required_rights_fields():
     assert approved.review_status == "approved"
     assert approved.license
     assert "overhead_clear" in approved.stroke_tags
+    assert approved.allows_user_facing_citation() is False
 
 
 def test_load_manifest_rejects_a_source_without_a_license(tmp_path: Path):

@@ -36,8 +36,10 @@ def test_empty_findings_do_not_invent_advice_from_a_measured_feature():
     assert findings.findings == []
     assert findings.features[0].value == 160
     assert feedback.tips == []
-    assert feedback.summary == "No supported technique fault was found for this overhead clear."
-    assert "arm extension" not in feedback.summary.lower()
+    assert feedback.summary.startswith("No supported technique fault was found for this overhead clear.")
+    assert "160" in feedback.summary
+    assert "not a validated technique finding" in feedback.summary.lower()
+    assert "low arm extension" not in feedback.summary.lower()
 
 
 def test_would_trigger_and_raw_features_are_not_findings():
@@ -61,7 +63,7 @@ def test_low_confidence_finding_keeps_its_uncertainty():
     _, feedback = _coach("findings-low-confidence.json")
 
     assert feedback.tips[0].finding_id == "clear.low_arm_extension.v1"
-    assert "low severity" in feedback.tips[0].explanation
+    assert "minor severity" in feedback.tips[0].explanation
     assert "0.42" in feedback.tips[0].explanation
     assert any("below 0.70 confidence" in item for item in feedback.limitations)
 
