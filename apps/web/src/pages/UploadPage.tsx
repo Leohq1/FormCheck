@@ -9,13 +9,16 @@ import { validateVideoFile } from '@/lib/videoValidation'
 import {
   MVP_STROKE,
   RECORDING_TIPS,
+  STROKE_OPTIONS,
   type Handedness,
+  type StrokeId,
   type ViewHint,
 } from '@/sports/config'
 
 export function UploadPage() {
   const navigate = useNavigate()
   const [file, setFile] = useState<File | null>(null)
+  const [stroke, setStroke] = useState<StrokeId>(MVP_STROKE.id)
   const [handedness, setHandedness] = useState<Handedness>('right')
   const [viewHint, setViewHint] = useState<ViewHint>('side')
   const [consent, setConsent] = useState(false)
@@ -34,7 +37,7 @@ export function UploadPage() {
       setFormErrors([])
       const api = getAnalysisApi()
       const created = await api.createAnalysis({
-        stroke: MVP_STROKE.id,
+        stroke,
         handedness,
         view_hint: viewHint,
         consent: true,
@@ -64,7 +67,7 @@ export function UploadPage() {
           Upload your clip
         </h1>
         <p className="text-[var(--color-muted)]">
-          Stroke is fixed to {MVP_STROKE.label} for this MVP.
+          Choose the stroke in your clip, then upload for coaching feedback.
         </p>
       </div>
 
@@ -78,6 +81,25 @@ export function UploadPage() {
         />
 
         <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <label htmlFor="stroke" className="block text-sm font-medium">
+              Stroke
+            </label>
+            <select
+              id="stroke"
+              className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+              value={stroke}
+              disabled={uploadMutation.isPending}
+              onChange={(event) => setStroke(event.target.value as StrokeId)}
+            >
+              {STROKE_OPTIONS.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className="space-y-2">
             <label htmlFor="handedness" className="block text-sm font-medium">
               Dominant hand
@@ -113,18 +135,6 @@ export function UploadPage() {
               <option value="rear_three_quarter">Rear three-quarter</option>
             </select>
           </div>
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="stroke" className="block text-sm font-medium">
-            Stroke
-          </label>
-          <input
-            id="stroke"
-            value={MVP_STROKE.label}
-            readOnly
-            className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-accent-soft)] px-3 py-2 text-[var(--color-muted)]"
-          />
         </div>
 
         <label className="flex items-start gap-3 text-sm">

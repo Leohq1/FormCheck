@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { TipsList } from '@/components/TipsList'
-import { MVP_SPORT, MVP_STROKE, RECORDING_TIPS } from '@/sports/config'
+import { RECORDING_TIPS } from '@/sports/config'
 
 export function GuidancePage() {
   return (
@@ -30,14 +30,11 @@ export function GuidancePage() {
 
         <div className="relative z-10 w-full px-5 pb-16 pt-28 sm:px-8 sm:pb-20">
           <div className="mx-auto max-w-3xl space-y-5">
-            <p className="hero-enter text-xs uppercase tracking-[0.22em] text-white/65">
-              {MVP_SPORT.label} · {MVP_STROKE.label}
-            </p>
             <h1 className="hero-enter-delay font-[family-name:var(--font-display)] text-4xl font-semibold leading-[1.05] text-white sm:text-5xl md:text-6xl">
-              Record one clear. Get coaching you can use.
+              Record one clip. Get coaching you can use.
             </h1>
             <p className="hero-enter-delay-2 max-w-xl text-base text-white/75 sm:text-lg">
-              Upload a short overhead-clear clip and FormCheck returns technique
+              Upload a short clip of a shot and FormCheck returns technique
               notes, drills, and cited coaching guidance.
             </p>
             <div className="hero-enter-delay-2 pt-2">

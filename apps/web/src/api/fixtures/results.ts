@@ -16,7 +16,7 @@ export function completedResult(analysisId: string): AnalysisResult {
     schema_version: '1.0.0',
     analysis_id: analysisId,
     status: 'completed',
-    stroke: 'overhead_clear',
+    stroke: 'clear',
     quality: {
       overall: 'acceptable',
       notes: [
@@ -91,7 +91,7 @@ export function inconclusiveResult(analysisId: string): AnalysisResult {
     schema_version: '1.0.0',
     analysis_id: analysisId,
     status: 'inconclusive',
-    stroke: 'overhead_clear',
+    stroke: 'clear',
     quality: {
       overall: 'poor',
       notes: [
@@ -134,7 +134,7 @@ export function failedResult(analysisId: string): AnalysisResult {
     schema_version: '1.0.0',
     analysis_id: analysisId,
     status: 'failed',
-    stroke: 'overhead_clear',
+    stroke: 'clear',
     quality: {
       overall: 'borderline',
       notes: [],
@@ -159,7 +159,7 @@ export function expiredResult(analysisId: string): AnalysisResult {
     schema_version: '1.0.0',
     analysis_id: analysisId,
     status: 'expired',
-    stroke: 'overhead_clear',
+    stroke: 'clear',
     quality: {
       overall: 'acceptable',
       notes: [],
