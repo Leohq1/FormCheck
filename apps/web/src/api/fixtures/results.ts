@@ -73,7 +73,7 @@ export function completedResult(analysisId: string): AnalysisResult {
       },
     ],
     limitations: [
-      'Analysis covers one overhead clear only.',
+      'Analysis covers one selected stroke (clear, smash, or drop) per clip.',
       'Confidence reflects model certainty, not a guarantee.',
       'This is technique guidance, not medical advice.',
     ],

@@ -118,7 +118,7 @@ A task is complete only when:
 
 ### 4.1 Mission
 
-Build the web interface through which users upload an overhead-clear video, monitor processing, view results, understand inconclusive analyses, and delete their data.
+Build the web interface through which users upload a clear, smash, or drop video, monitor processing, view results, understand inconclusive analyses, and delete their data.
 
 The frontend must depend only on the backend API. It must not call the analysis worker, PostgreSQL, Redis, object storage, or the language-model provider directly.
 
@@ -151,7 +151,7 @@ Recommended stack:
 
 Explain how to record an eligible video:
 
-- Record one overhead clear.
+- Record exactly one stroke (clear, smash, or drop).
 - Keep the whole body visible.
 - Use a side or rear three-quarter view.
 - Prefer 60 frames per second.
@@ -167,7 +167,7 @@ The screen must make clear that the system provides technique guidance and not m
 The upload form must collect:
 
 - Video file
-- Stroke type, fixed to overhead clear for the MVP
+- Stroke type, selectable as clear, smash, or drop
 - Dominant hand
 - Camera-view hint
 - Consent to process the video
@@ -724,7 +724,7 @@ Do not continue into fault detection when required landmarks or phases are unrel
 
 ### 6.7 Stroke segmentation
 
-The MVP assumes one overhead clear, but the system must locate the stroke window.
+The MVP assumes one selected stroke (clear, smash, or drop), but the system must locate the stroke window.
 
 Use signals such as:
 
@@ -827,7 +827,7 @@ Example rule:
 
 ```yaml
 rule_id: clear.late_elbow_extension.v1
-stroke: overhead_clear
+stroke: clear
 
 requires:
   - elbow_extension_peak_offset_ms
@@ -843,7 +843,7 @@ condition:
   elbow_extension_peak_offset_ms > 45
 
 retrieval_tags:
-  - overhead_clear
+  - clear
   - timing
   - elbow_extension
 ```
@@ -871,7 +871,7 @@ Return `AnalysisFindings`:
     "warnings": []
   },
   "stroke": {
-    "type": "overhead_clear",
+    "type": "clear",
     "start_time_ms": 4200,
     "end_time_ms": 7100,
     "contact_time_ms": 6240,
@@ -891,7 +891,7 @@ Return `AnalysisFindings`:
         }
       ],
       "retrieval_tags": [
-        "overhead_clear",
+        "clear",
         "timing",
         "elbow_extension"
       ]
@@ -993,7 +993,7 @@ Every source must record:
   "publication_date": "...",
   "license": "...",
   "allowed_use": "...",
-  "stroke_tags": ["overhead_clear"],
+  "stroke_tags": ["clear", "smash", "drop"],
   "fault_tags": ["elbow_extension"],
   "review_status": "approved",
   "reviewer": "...",
@@ -1043,7 +1043,7 @@ Example query input:
 
 ```json
 {
-  "stroke": "overhead_clear",
+  "stroke": "clear",
   "finding": "late_elbow_extension",
   "phase": "estimated_contact",
   "severity": "moderate",
@@ -1251,7 +1251,7 @@ Produced by Person 2 and consumed by Person 3:
   "schema_version": "1",
   "analysis_id": "abc123",
   "video_object_key": "analyses/abc123/normalized.mp4",
-  "stroke": "overhead_clear",
+  "stroke": "clear",
   "handedness": "right",
   "view_hint": "rear_three_quarter",
   "pipeline_version": "2026.10.0"

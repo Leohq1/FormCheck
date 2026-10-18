@@ -8,15 +8,15 @@ The first release will:
 
 - Support a web application.
 - Accept an asynchronously processed video upload.
-- Analyze one player performing one overhead clear.
+- Analyze one player performing one selected stroke: clear, smash, or drop.
 - Use MediaPipe as the only MVP pose-estimation implementation.
 - Use deterministic, rule-based technique fault detection.
 - Use a curated coaching corpus for retrieval-augmented feedback.
 - Operate without user accounts or saved progress.
 - Run locally first and move to cloud hosting only after evaluation targets pass.
-- Keep overhead smash, professional-movement similarity, multi-camera analysis, and live feedback outside the MVP.
+- Keep professional-movement similarity, multi-camera analysis, and live feedback outside the MVP.
 
-The first complete analysis target is one controlled overhead-clear video, one trustworthy feature, one rule-produced finding, one retrieved coaching passage, and one result displayed in the web application.
+The first complete analysis target is one controlled stroke video (clear, smash, or drop), one trustworthy feature, one rule-produced finding, one retrieved coaching passage, and one result displayed in the web application.
 
 ## 2 Team organization
 
@@ -103,7 +103,7 @@ expired
 - Maximum duration: 30 seconds.
 - Minimum recommended resolution: 720p; 1080p preferred.
 - Accepted frame rate: 30–120 fps; 60 fps preferred.
-- The clip must contain exactly one overhead clear.
+- The clip must contain exactly one selected stroke (clear, smash, or drop).
 - The entire player must remain visible.
 - The camera should use a side or rear three-quarter view.
 - The camera should remain stable with adequate lighting.
@@ -314,7 +314,7 @@ Convert a normalized video into conservative, explainable, rule-produced techniq
 
 1. Define the `PoseEstimator` interface and canonical `PoseSequence`.
 2. Implement `MediaPipePoseEstimator`.
-3. Process one team-owned overhead-clear video.
+3. Process one team-owned sample stroke video (clear, smash, or drop).
 4. Save timestamps, canonical landmarks, coordinates, confidence, and missing-landmark state.
 5. Implement initial pose-quality checks.
 6. Implement stroke-window and phase prototypes.
@@ -370,7 +370,7 @@ Turn structured findings into concise, cited coaching guidance and maintain the 
 2. Define the source-manifest format in `corpus/manifests/`.
 3. Extract, clean, chunk, and tag the approved material.
 4. Create embeddings and store them using PostgreSQL and pgvector.
-5. Test retrieval using a hard-coded overhead-clear finding.
+5. Test retrieval using a hard-coded stroke finding (clear, smash, or drop).
 6. Implement the feedback-generator interface and strict result schema.
 7. Add citation validation and deterministic fallback behavior.
 8. Coordinate retrieval, generation, and system evaluation sets.
@@ -467,7 +467,6 @@ Do not block the MVP on:
 - Cloud-provider selection
 - YOLO Pose or MMPose
 - GPU hosting
-- Overhead smash
 - Professional-player similarity scoring
 - Professional-video sourcing
 - Multi-camera analysis
