@@ -5,7 +5,7 @@ test('guidance to upload to results happy path', async ({ page }) => {
 
   await expect(
     page.getByRole('heading', {
-      name: /record one clear/i,
+      name: /record one clip/i,
     }),
   ).toBeVisible()
 

@@ -6,7 +6,7 @@ Version 1.0  |  16 October 2026
 
 ## Purpose
 
-This document defines an implementable web system that accepts a badminton video, analyzes one overhead clear, detects a bounded set of technique faults with deterministic rules, and returns source-grounded coaching feedback. It is written for the developers who will build and evaluate the prototype, including the interfaces needed to replace early components later.
+This document defines an implementable web system that accepts a badminton video, analyzes one selected stroke (clear, smash, or drop), detects a bounded set of technique faults with deterministic rules, and returns source-grounded coaching feedback. It is written for the developers who will build and evaluate the prototype, including the interfaces needed to replace early components later.
 
 ## Recommended direction
 
@@ -16,8 +16,8 @@ Build a modular monolith first: a React web client, a Python FastAPI service, a 
 
 | **Area** | **Decision** |
 | --- | --- |
-| MVP | Overhead clear; one player; one uploaded clip; asynchronous result |
-| Optional next stroke | Overhead smash after clear criteria pass |
+| MVP | Clear, smash, or drop; one player; one uploaded clip; asynchronous result |
+| Stroke selection | User selects clear, smash, or drop at upload |
 | Analysis | Rule-based technique fault detection |
 | RAG | Curated, versioned coaching sources with inline citations |
 | Identity | No accounts or longitudinal history |
@@ -82,11 +82,11 @@ Sections 3–12 explain the processing pipeline. Sections 13–17 specify implem
 
 # 1 Executive summary
 
-The prototype analyzes technique; it does not diagnose injury, measure shuttle speed, or replace a coach. A user uploads a short side or rear three-quarter video containing one overhead clear. The server validates and normalizes the video, estimates body landmarks per frame, identifies the stroke window and key phases, computes interpretable kinematic features, and evaluates conservative rules. Each triggered rule becomes a structured finding with a confidence score and evidence. A retrieval pipeline then selects relevant passages from a curated coaching corpus and asks a language model to express only those findings as concise, cited feedback.
+The prototype analyzes technique; it does not diagnose injury, measure shuttle speed, or replace a coach. A user uploads a short side or rear three-quarter video containing one clear, smash, or drop and selects that stroke type at upload. The server validates and normalizes the video, estimates body landmarks per frame, identifies the stroke window and key phases, computes interpretable kinematic features, and evaluates conservative rules. Each triggered rule becomes a structured finding with a confidence score and evidence. A retrieval pipeline then selects relevant passages from a curated coaching corpus and asks a language model to express only those findings as concise, cited feedback.
 
 The architecture deliberately separates measurement, interpretation, and language generation. Pose estimation produces observations. Deterministic code produces fault findings. Retrieval supplies trusted coaching evidence. The language model may rephrase and prioritize but must not invent a biomechanical finding. This separation makes behavior testable, reduces hallucination risk, and lets the team improve pose models or language providers independently.
 
-Success means that qualified overhead-clear clips complete reliably, rejected clips fail with actionable capture guidance, supported faults meet agreed precision on an expert-labeled set, and every coaching claim is traceable to both motion evidence and a curated source passage.
+Success means that qualified clear, smash, and drop clips complete reliably, rejected clips fail with actionable capture guidance, supported faults meet agreed precision on an expert-labeled set, and every coaching claim is traceable to both motion evidence and a curated source passage.
 
 # 2 Product scope and requirements
 
@@ -94,7 +94,7 @@ Success means that qualified overhead-clear clips complete reliably, rejected cl
 
 1. Open the web application and review capture guidance.
 
-1. Upload a short video and confirm that it contains one overhead clear.
+1. Upload a short video, select the stroke type (clear, smash, or drop), and confirm the clip contains that single stroke.
 
 1. Receive an analysis identifier immediately and view queued or processing status.
 
@@ -108,7 +108,7 @@ Success means that qualified overhead-clear clips complete reliably, rejected cl
 | --- | --- | --- |
 | FR 1 | Accept MP4 or MOV uploads through an asynchronous job API. | Valid upload returns 202 and an analysis ID. |
 | FR 2 | Validate duration, size, codec, frame rate, resolution, and visible-player quality. | Invalid media returns a specific remediation code. |
-| FR 3 | Analyze a single overhead clear. | The system produces phase landmarks or an inconclusive result. |
+| FR 3 | Analyze a single selected stroke (clear, smash, or drop). | The system produces phase landmarks or an inconclusive result. |
 | FR 4 | Apply versioned rule-based fault detectors. | Every finding names the rule, threshold, value, and confidence. |
 | FR 5 | Generate grounded feedback from curated sources. | Every recommendation cites at least one approved chunk. |
 | FR 6 | Operate without user accounts. | Analysis is accessed by a high-entropy capability token. |
@@ -197,7 +197,7 @@ State transitions are compare-and-set updates. A worker records stage start and 
 
 ## 5.1 Capture contract
 
-- Target 10–20 seconds and exactly one overhead clear.
+- Target 10–20 seconds and exactly one selected stroke (clear, smash, or drop).
 
 - Prefer 60 fps; accept 30–120 fps. Minimum 720p; 1080p recommended.
 
@@ -244,7 +244,7 @@ Every derived feature carries availability and confidence. A feature confidence 
 
 # 7 Stroke segmentation and phase detection
 
-The upload contract simplifies segmentation to one stroke, but the worker must still locate it. First compute motion-energy candidates from wrist, elbow, shoulder, and torso velocities. Then identify a contiguous window containing preparation, acceleration, estimated contact, and follow-through. For the clear MVP, contact is a body-kinematic proxy because the system does not track the shuttle or racket.
+The upload contract simplifies segmentation to one stroke, but the worker must still locate it. First compute motion-energy candidates from wrist, elbow, shoulder, and torso velocities. Then identify a contiguous window containing preparation, acceleration, estimated contact, and follow-through. For the MVP strokes, contact is a body-kinematic proxy because the system does not track the shuttle or racket.
 
 | **Phase** | **Operational definition** | **Primary signals** |
 | --- | --- | --- |
@@ -279,7 +279,7 @@ A rule is a versioned, testable function over features and quality context. It r
 
 ```text
 rule_id: clear.late_elbow_extension.v1
-stroke: overhead_clear
+stroke: clear
 requires: [elbow_extension_timing, contact_time]
 applicable_when:
   view: [side, rear_three_quarter]
@@ -288,7 +288,7 @@ condition:
   elbow_extension_peak_ms_after_contact > 45
 severity_bands: {minor: 45, moderate: 80, major: 120}
 message_key: late_elbow_extension
-retrieval_tags: [overhead_clear, timing, elbow_extension]
+retrieval_tags: [clear, timing, elbow_extension]
 ```
 
 ## Candidate rules for calibration
@@ -367,7 +367,7 @@ The corpus contains curated coaching manuals, federation resources, peer-reviewe
 
 ## 11.3 Retrieval
 
-Construct the query from structured findings, phase, stroke, severity, and the user’s observable evidence. Apply hard metadata filters for overhead clear and approved status. Combine vector similarity with keyword or BM25 ranking, then optionally rerank the top candidates. Return three to six nonredundant chunks. Retrieval must expose source IDs and locators to the generator and final UI.
+Construct the query from structured findings, phase, stroke, severity, and the user’s observable evidence. Apply hard metadata filters for the selected stroke (clear, smash, or drop) and approved status. Combine vector similarity with keyword or BM25 ranking, then optionally rerank the top candidates. Return three to six nonredundant chunks. Retrieval must expose source IDs and locators to the generator and final UI.
 
 ## 11.4 Generation contract
 
@@ -438,7 +438,7 @@ Use /api/v1, JSON, UTC ISO 8601 timestamps, UUIDv7 identifiers, and a capability
   "filename": "clear.mp4",
   "content_type": "video/mp4",
   "size_bytes": 18420342,
-  "stroke": "overhead_clear",
+  "stroke": "clear",
   "handedness": "right",
   "view_hint": "rear_three_quarter",
   "consent_to_process": true
@@ -453,7 +453,7 @@ Use /api/v1, JSON, UTC ISO 8601 timestamps, UUIDv7 identifiers, and a capability
   "status": "completed",
   "pipeline_version": "2026.10.0",
   "quality": {"overall": 0.84, "warnings": []},
-  "stroke": {"type": "overhead_clear", "contact_time_ms": 6240, "confidence": 0.78},
+  "stroke": {"type": "clear", "contact_time_ms": 6240, "confidence": 0.78},
   "findings": [{
     "rule_id": "clear.late_elbow_extension.v1",
     "label": "Late elbow extension",
@@ -679,7 +679,7 @@ One developer can prototype the pipeline, but rule calibration requires a qualif
 | Default retention period | Before external users. | Privacy policy, user need and operating cost. |
 | Hosted AI provider approval and region | Before external users if hosted generation is enabled. | Privacy/legal review, residency, retention and evaluation. |
 | Whether to render annotated video | Before result UI freeze. | User-study benefit versus processing and privacy cost. |
-| Smash inclusion | After clear MVP gate. | Separate data, rules and evaluation; not a configuration toggle. |
+| Per-stroke rule depth for smash and drop | After shared stroke contract is stable. | Clear, smash, and drop are selectable at upload; deepen stroke-specific rules and evals as labeled data allows. |
 
 # 25 Appendices
 
