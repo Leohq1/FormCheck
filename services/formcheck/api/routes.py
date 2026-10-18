@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Response, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, Response, status
 from fastapi.responses import JSONResponse
 from jsonschema import ValidationError
 from sqlalchemy.orm import Session
@@ -165,6 +165,23 @@ def create_analysis(
     _audit(db, analysis_id, "analysis.created", correlation_id, {"stroke": body.stroke})
     db.commit()
     return response
+
+
+@router.put("/analyses/{analysis_id}/upload", status_code=status.HTTP_204_NO_CONTENT)
+async def receive_upload(
+    request: Request,
+    analysis: Analysis = Depends(get_analysis_for_token),
+) -> Response:
+    """Accept the video on the API so browsers do not need a public storage host."""
+    settings = get_settings()
+    payload = await request.body()
+    if not payload:
+        raise HTTPException(status_code=400, detail="Uploaded object is empty")
+    if len(payload) > settings.max_upload_bytes:
+        raise HTTPException(status_code=413, detail="Uploaded object exceeds size limit")
+    content_type = request.headers.get("content-type") or analysis.content_type or "application/octet-stream"
+    ObjectStorage(settings).put_bytes(analysis.source_object_key, payload, content_type)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.post(
