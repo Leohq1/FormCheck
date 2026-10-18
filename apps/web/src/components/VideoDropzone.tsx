@@ -1,6 +1,9 @@
 import { useId, useState, type DragEvent, type ChangeEvent } from 'react'
 import { HugeiconsIcon } from '@hugeicons/react'
 import { Upload01Icon, Video01Icon } from '@hugeicons/core-free-icons'
+import SpecularButton, {
+  specularGhostLightProps,
+} from '@/components/SpecularButton'
 
 interface VideoDropzoneProps {
   file: File | null
@@ -84,14 +87,18 @@ export function VideoDropzone({
         />
       </label>
       {file ? (
-        <button
+        <SpecularButton
           type="button"
-          className="text-sm font-medium text-[var(--color-accent)] underline-offset-4 hover:underline"
-          onClick={() => onFileChange(null)}
+          {...specularGhostLightProps}
+          size="sm"
+          textColor="#ae3121"
+          lineColor="#ae3121"
+          baseColor="#a8a8a5"
           disabled={disabled}
+          onClick={() => onFileChange(null)}
         >
           Choose a different clip
-        </button>
+        </SpecularButton>
       ) : null}
     </div>
   )
