@@ -13,6 +13,14 @@ CREATE_BODY = {
 }
 
 
+def test_create_accepts_frontend_clear_and_rejects_unanalyzed_strokes(client):
+    created = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": "clear"})
+    assert created.status_code == 201
+
+    accepted = client.post("/api/v1/analyses", json={**CREATE_BODY, "stroke": "smash"})
+    assert accepted.status_code == 201
+
+
 def test_health(client):
     res = client.get("/api/v1/health")
     assert res.status_code == 200

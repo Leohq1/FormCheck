@@ -1,0 +1,229 @@
+[
+  {
+    "source_id": "knsu-schmitz-2019-clear-contact",
+    "title": "Clear contact and arm extension",
+    "author": "Vanessa Schmitz, Christian Bien, Felix Weyer",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2019",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "contact_reach",
+      "arm_extension"
+    ],
+    "phase_tags": [
+      "estimated_contact"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "5cbc6638a0a97224acbcb2a8bc0db27ce4ea4a821d4051a5a57330a37e714025",
+    "text_file": "../documents/knsu-schmitz-2019-clear-contact.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow",
+      "shoulder"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "p. 3"
+  },
+  {
+    "source_id": "knsu-schmitz-2019-clear-recovery",
+    "title": "Clear follow-through",
+    "author": "Vanessa Schmitz, Christian Bien, Felix Weyer",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2019",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "recovery"
+    ],
+    "phase_tags": [
+      "recovery"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "cc7173986bfea442c2044b8faa9823e5f7d6423862074dc77d72010bf6308588",
+    "text_file": "../documents/knsu-schmitz-2019-clear-recovery.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "p. 3"
+  },
+  {
+    "source_id": "knsu-schmitz-2019-drop",
+    "title": "Overhead drop",
+    "author": "Vanessa Schmitz, Christian Bien, Felix Weyer",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2019",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "overhead_drop"
+    ],
+    "fault_tags": [
+      "contact_reach"
+    ],
+    "phase_tags": [
+      "estimated_contact"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "29667e1f87e8636fb19762a99b8364c49f1fbca359073ea34ba73d1fb7cb0f6b",
+    "text_file": "../documents/knsu-schmitz-2019-drop.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "p. 4"
+  },
+  {
+    "source_id": "knsu-schmitz-2019-smash",
+    "title": "Overhead smash",
+    "author": "Vanessa Schmitz, Christian Bien, Felix Weyer",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2019",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "overhead_smash"
+    ],
+    "fault_tags": [
+      "arm_extension"
+    ],
+    "phase_tags": [
+      "estimated_contact"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "b7c235de382b314ab06ad2952e8fbb9770942cfaa9f9288324d72ff97121ce1e",
+    "text_file": "../documents/knsu-schmitz-2019-smash.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "p. 5"
+  },
+  {
+    "source_id": "knsu-pries-2018-clear-contact",
+    "title": "Forehand overhead clear contact",
+    "author": "Catherine Pries, Marius Winkler",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2018",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "contact_reach",
+      "arm_extension"
+    ],
+    "phase_tags": [
+      "estimated_contact"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "a72153ce81b463e1d0863f240744a3d42e96cba84e1d83af154d888c965127d4",
+    "text_file": "../documents/knsu-pries-2018-clear-contact.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow",
+      "shoulder",
+      "wrist"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "pp. 3, 6, 9"
+  },
+  {
+    "source_id": "knsu-pries-2018-clear-preparation",
+    "title": "Forehand overhead clear preparation",
+    "author": "Catherine Pries, Marius Winkler",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2018",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "preparation",
+      "follow_through"
+    ],
+    "phase_tags": [
+      "backswing",
+      "recovery"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "5d265b8de588663d65625c0bae85d67635826e721bb0593983b2b977460ce47b",
+    "text_file": "../documents/knsu-pries-2018-clear-preparation.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "shoulder",
+      "hip",
+      "wrist",
+      "non_dominant_arm"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "pp. 6, 9, 10"
+  },
+  {
+    "source_id": "knsu-pries-2018-high-serve",
+    "title": "High serve",
+    "author": "Catherine Pries, Marius Winkler",
+    "publisher": "KNSU, Institut f\u00fcr Sportwissenschaft, Universit\u00e4t Koblenz-Landau, Campus Koblenz",
+    "publication_date": "2018",
+    "license": "CC BY-SA 4.0",
+    "allowed_use": "Store, translate, and retrieve with attribution. Share adaptations under CC BY-SA 4.0. https://creativecommons.org/licenses/by-sa/4.0/",
+    "stroke_tags": [
+      "high_serve"
+    ],
+    "fault_tags": [
+      "arm_extension"
+    ],
+    "phase_tags": [
+      "contact"
+    ],
+    "review_status": "approved",
+    "reviewer": "person-4",
+    "review_date": "2026-10-17",
+    "content_hash": "2d19e95799274c82be33f6cfc029d7a5c97de2d540a310bd5082124733aa809b",
+    "text_file": "../documents/knsu-pries-2018-high-serve.md",
+    "source_version": "en-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow",
+      "wrist"
+    ],
+    "audience": "school physical education",
+    "skill_level": "beginner",
+    "page_locator": "pp. 5, 7, 8"
+  }
+]

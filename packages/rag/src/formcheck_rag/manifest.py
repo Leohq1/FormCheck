@@ -12,9 +12,14 @@ class SourceManifest(BaseModel):
     publication_date: str
     license: str = Field(min_length=1)
     allowed_use: str = Field(min_length=1)
+    source_version: str = Field(min_length=1)
     stroke_tags: list[str]
     fault_tags: list[str]
     phase_tags: list[str] = Field(default_factory=list)
+    body_region_tags: list[str]
+    audience: str = Field(min_length=1)
+    skill_level: str = Field(min_length=1)
+    page_locator: str = Field(min_length=1)
     review_status: str
     reviewer: str
     review_date: str

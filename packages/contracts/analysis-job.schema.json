@@ -30,7 +30,7 @@
     },
     "stroke": {
       "type": "string",
-      "enum": ["overhead_clear"]
+      "enum": ["overhead_clear", "smash", "drop"]
     },
     "handedness": {
       "type": "string",

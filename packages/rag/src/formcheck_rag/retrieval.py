@@ -3,6 +3,7 @@ import re
 from pydantic import BaseModel, Field
 
 from formcheck_rag.chunking import Chunk
+from formcheck_rag.embeddings import embed_text
 from formcheck_rag.findings import AnalysisFindings
 
 _TOKEN = re.compile(r"[a-z0-9_]+")
@@ -59,8 +60,16 @@ class InMemoryIndex:
         return merged[:limit]
 
 
+_STROKE_ALIASES = {
+    "clear": "overhead_clear",
+    "smash": "overhead_smash",
+    "drop": "overhead_drop",
+}
+
+
 def queries_from_findings(findings: AnalysisFindings) -> list[RetrievalQuery]:
-    stroke = str(findings.stroke.get("type") or "overhead_clear")
+    raw_stroke = str(findings.stroke.get("type") or "overhead_clear")
+    stroke = _STROKE_ALIASES.get(raw_stroke, raw_stroke)
     phase = findings.stroke.get("phase")
     queries: list[RetrievalQuery] = []
     for finding in findings.findings:
@@ -91,7 +100,13 @@ def _tokens(value: str) -> set[str]:
 
 
 def _score(query: RetrievalQuery, chunk: Chunk) -> float:
-    query_tokens = _tokens(" ".join([query.finding, query.evidence_summary, query.phase or "", *query.fault_tags]))
+    query_text = " ".join([query.finding, query.evidence_summary, query.phase or "", *query.fault_tags])
+    query_tokens = _tokens(query_text)
     text_tokens = _tokens(chunk.text)
     tag_tokens = _tokens(" ".join([*chunk.fault_tags, *chunk.phase_tags, chunk.locator]))
-    return float(len(query_tokens & text_tokens) + (2 * len(query_tokens & tag_tokens)))
+    lexical = float(len(query_tokens & text_tokens) + (2 * len(query_tokens & tag_tokens)))
+    return lexical + _cosine(embed_text(query_text), embed_text(chunk.text))
+
+
+def _cosine(left: list[float], right: list[float]) -> float:
+    return sum(a * b for a, b in zip(left, right))

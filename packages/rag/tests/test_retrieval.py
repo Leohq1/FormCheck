@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from formcheck_rag.chunking import chunk_document
+from formcheck_rag.findings import AnalysisFindings
 from formcheck_rag.manifest import load_manifest
 from formcheck_rag.retrieval import InMemoryIndex, RetrievalQuery
 
@@ -37,6 +38,29 @@ def test_retrieval_returns_approved_overhead_clear_elbow_passages_only():
     assert hits[0].locator
     assert hits[0].corpus_version == "test-1"
     assert hits[0].relevance_score > 0
+
+
+def test_frontend_clear_id_and_contract_severity_still_retrieve():
+    findings = AnalysisFindings.model_validate(
+        {
+            "analysis_id": "abc123",
+            "stroke": {"type": "clear"},
+            "findings": [
+                {
+                    "rule_id": "clear.low_arm_extension.v1",
+                    "label": "Low arm extension at maximum reach",
+                    "severity": "minor",
+                    "confidence": 0.8,
+                    "retrieval_tags": ["clear", "contact_reach", "arm_extension"],
+                }
+            ],
+        }
+    )
+
+    hits = _index().search_findings(findings)
+
+    assert hits
+    assert all("overhead_clear" in hit.stroke_tags for hit in hits)
 
 
 def test_retrieval_skips_a_different_stroke():

@@ -7,14 +7,31 @@
     "publication_date": "2026-10-17",
     "license": "project-test",
     "allowed_use": "Automated tests and local demos only. Not a coaching authority.",
-    "stroke_tags": ["overhead_clear"],
-    "fault_tags": ["contact_reach", "arm_extension", "recovery"],
-    "phase_tags": ["estimated_contact", "recovery"],
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "contact_reach",
+      "arm_extension",
+      "recovery"
+    ],
+    "phase_tags": [
+      "estimated_contact",
+      "recovery"
+    ],
     "review_status": "approved",
     "reviewer": "person-4",
     "review_date": "2026-10-17",
     "content_hash": "synthetic-clear-v1",
-    "text_file": "clear-coaching.md"
+    "text_file": "clear-coaching.md",
+    "source_version": "synthetic-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow"
+    ],
+    "audience": "automated test",
+    "skill_level": "unspecified",
+    "page_locator": "fixture"
   },
   {
     "source_id": "source-test-pending",
@@ -24,13 +41,28 @@
     "publication_date": "2026-10-17",
     "license": "project-test",
     "allowed_use": "Must never be retrieved.",
-    "stroke_tags": ["overhead_clear"],
-    "fault_tags": ["contact_reach", "arm_extension"],
-    "phase_tags": ["estimated_contact"],
+    "stroke_tags": [
+      "overhead_clear"
+    ],
+    "fault_tags": [
+      "contact_reach",
+      "arm_extension"
+    ],
+    "phase_tags": [
+      "estimated_contact"
+    ],
     "review_status": "pending",
     "reviewer": "person-4",
     "review_date": "2026-10-17",
     "content_hash": "synthetic-pending-v1",
-    "text_file": "pending-coaching.md"
+    "text_file": "pending-coaching.md",
+    "source_version": "synthetic-1",
+    "body_region_tags": [
+      "dominant_arm",
+      "elbow"
+    ],
+    "audience": "automated test",
+    "skill_level": "unspecified",
+    "page_locator": "fixture"
   }
 ]

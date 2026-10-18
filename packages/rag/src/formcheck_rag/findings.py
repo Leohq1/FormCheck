@@ -23,7 +23,7 @@ class FeatureMeasurement(BaseModel):
 class Finding(BaseModel):
     rule_id: str
     label: str
-    severity: str = Field(pattern="^(low|moderate|high)$")
+    severity: str = Field(pattern="^(low|medium|moderate|high|minor|major)$")
     confidence: float = Field(ge=0.0, le=1.0)
     evidence: list[EvidenceItem] = Field(default_factory=list)
     retrieval_tags: list[str] = Field(default_factory=list)

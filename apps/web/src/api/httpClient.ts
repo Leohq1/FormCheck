@@ -1,4 +1,5 @@
 import type { AnalysisApi } from '@/api/client'
+import { normalizeResult } from '@/api/normalizeResult'
 import type {
   AnalysisProgress,
   AnalysisResult,
@@ -62,12 +63,13 @@ export function createHttpClient(baseUrl: string): AnalysisApi {
       )
     },
 
-    getResult(analysisId: string, capabilityToken: string) {
-      return requestJson<AnalysisResult>(
+    async getResult(analysisId: string, capabilityToken: string) {
+      const payload = await requestJson<AnalysisResult>(
         root,
         `/api/v1/analyses/${analysisId}/result`,
         { capabilityToken },
       )
+      return normalizeResult(payload)
     },
 
     async deleteAnalysis(analysisId: string, capabilityToken: string) {

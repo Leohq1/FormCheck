@@ -30,7 +30,7 @@
       "additionalProperties": false,
       "required": ["type", "confidence"],
       "properties": {
-        "type": { "type": "string", "enum": ["overhead_clear"] },
+        "type": { "type": "string", "enum": ["overhead_clear", "smash", "drop"] },
         "start_time_ms": { "type": ["integer", "null"], "minimum": 0 },
         "end_time_ms": { "type": ["integer", "null"], "minimum": 0 },
         "contact_time_ms": { "type": ["integer", "null"], "minimum": 0 },
