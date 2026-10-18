@@ -1,0 +1,12 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+COPY services/requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
+
+COPY services/formcheck /app/formcheck
+COPY packages/contracts /contracts
+
+ENV PYTHONPATH=/app
+ENV FORMCHECK_CONTRACTS_DIR=/contracts
+CMD ["dramatiq", "formcheck.worker.tasks", "--processes", "1", "--threads", "2"]

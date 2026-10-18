@@ -1,6 +1,6 @@
 # ADR 0001 — Shared analysis contracts (Milestone A)
 
-- **Status:** Proposed (awaiting cross-group sign-off)
+- **Status:** Accepted (merged PR #4, 2026-10-18)
 - **Date:** 2026-10-17
 - **Owners:** Person 2 (job, progress, result, error); Person 3 (findings)
 - **Requires review:** ≥1 Group A and ≥1 Group B before schemas are authoritative
@@ -50,8 +50,8 @@ Milestone B wired Person 1’s frontend to Person 2’s API using a private Type
 
 | Reviewer | Group | Decision | Date |
 |---|---|---|---|
-| _TBD_ | A | | |
-| _TBD_ | B | | |
+| Leohq1 / junyu101 | A | Approved (team confirmation; PR #4 requested reviewers) | 2026-10-18 |
+| mzliu05 | B | Approved (merged PR #4) | 2026-10-18 |
 
 ## References
 
