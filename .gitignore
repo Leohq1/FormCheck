@@ -7,6 +7,10 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+.local/*
+!.local/README.md
+*.egg-info/
+build/
 venv/
 .worktrees/
 node_modules/

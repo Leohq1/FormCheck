@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=80,<83"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "formcheck-analysis"
+version = "0.1.0"
+description = "FormCheck video, pose, biomechanics, and analysis pipeline"
+requires-python = ">=3.12,<3.13"
+dependencies = ["numpy>=2.5.4,<3", "pydantic>=2.14.1,<3"]
+
+[dependency-groups]
+analysis = ["mediapipe>=1.1.1,<2", "opencv-python-headless>=5.0.0.93,<6", "scipy>=1.18.1,<2"]
+test = ["pytest>=9.1.1,<10", "hypothesis>=6.170.1,<7"]
+dev = [
+    { include-group = "analysis" },
+    { include-group = "test" },
+    "ruff>=0.17.1,<0.18",
+    "mypy>=2.4.0,<3",
+]
+
+[tool.setuptools.packages.find]
+where = [
+    "packages/video",
+    "packages/pose",
+    "packages/biomechanics",
+    "packages/rules",
+    "services/worker/analysis",
+]
+include = ["formcheck_video*", "formcheck_pose*", "formcheck_biomechanics*", "formcheck_rules*", "formcheck_analysis*"]
+namespaces = false
+
+[tool.setuptools.package-dir]
+formcheck_video = "packages/video/formcheck_video"
+formcheck_pose = "packages/pose/formcheck_pose"
+formcheck_biomechanics = "packages/biomechanics/formcheck_biomechanics"
+formcheck_rules = "packages/rules/formcheck_rules"
+formcheck_analysis = "services/worker/analysis/formcheck_analysis"
+
+[tool.pytest.ini_options]
+testpaths = ["packages", "services/worker/analysis/tests"]
+addopts = "--strict-markers"
+markers = [
+    "integration: tests that exercise external tools or adapters",
+    "assets: tests that require explicitly supplied local video or model assets",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
