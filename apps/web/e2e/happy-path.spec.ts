@@ -19,8 +19,10 @@ test('guidance to upload to results happy path', async ({ page }) => {
     mimeType: 'video/mp4',
     buffer: Buffer.from('mock-overhead-clear-bytes'),
   })
-  await page.getByLabel(/dominant hand/i).selectOption('right')
-  await page.getByLabel(/camera view/i).selectOption('side')
+  await page.getByRole('combobox', { name: /dominant hand/i }).click()
+  await page.getByRole('option', { name: /right/i }).click()
+  await page.getByRole('combobox', { name: /camera view/i }).click()
+  await page.getByRole('option', { name: /^side$/i }).click()
   await page.getByRole('checkbox').check()
   await page.getByRole('button', { name: /analyze clip/i }).click()
 

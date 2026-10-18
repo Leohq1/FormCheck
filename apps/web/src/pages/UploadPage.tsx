@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { getAnalysisApi } from '@/api'
 import { storeCapabilityToken } from '@/api/session'
+import GlideSelect from '@/components/GlideSelect'
 import { TipsList } from '@/components/TipsList'
 import { VideoDropzone } from '@/components/VideoDropzone'
 import { validateVideoFile } from '@/lib/videoValidation'
@@ -14,6 +15,31 @@ import {
   type StrokeId,
   type ViewHint,
 } from '@/sports/config'
+
+const STROKE_SELECT_OPTIONS = STROKE_OPTIONS.map((option) => ({
+  value: option.id,
+  label: option.label,
+}))
+
+const HAND_OPTIONS = [
+  { value: 'right', label: 'Right' },
+  { value: 'left', label: 'Left' },
+]
+
+const VIEW_OPTIONS = [
+  { value: 'side', label: 'Side', tag: 'Preferred' },
+  { value: 'rear_three_quarter', label: 'Rear three-quarter' },
+]
+
+const SELECT_THEME = {
+  accentColor: 'var(--color-accent)',
+  surfaceColor: 'var(--color-surface)',
+  highlightColor: 'var(--color-border)',
+  textColor: 'var(--color-ink)',
+  size: 'lg' as const,
+  radius: 6,
+  menuWidth: 220,
+}
 
 export function UploadPage() {
   const navigate = useNavigate()
@@ -82,58 +108,45 @@ export function UploadPage() {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <label htmlFor="stroke" className="block text-sm font-medium">
-              Stroke
-            </label>
-            <select
-              id="stroke"
-              className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+            <span className="block text-sm font-medium">Stroke</span>
+            <GlideSelect
+              className="w-full"
+              options={STROKE_SELECT_OPTIONS}
               value={stroke}
               disabled={uploadMutation.isPending}
-              onChange={(event) => setStroke(event.target.value as StrokeId)}
-            >
-              {STROKE_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
+              ariaLabel="Stroke"
+              showTags
+              onChange={(next) => setStroke(next as StrokeId)}
+              {...SELECT_THEME}
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="handedness" className="block text-sm font-medium">
-              Dominant hand
-            </label>
-            <select
-              id="handedness"
-              className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+            <span className="block text-sm font-medium">Dominant hand</span>
+            <GlideSelect
+              className="w-full"
+              options={HAND_OPTIONS}
               value={handedness}
               disabled={uploadMutation.isPending}
-              onChange={(event) =>
-                setHandedness(event.target.value as Handedness)
-              }
-            >
-              <option value="right">Right</option>
-              <option value="left">Left</option>
-            </select>
+              ariaLabel="Dominant hand"
+              showTags={false}
+              onChange={(next) => setHandedness(next as Handedness)}
+              {...SELECT_THEME}
+            />
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="view-hint" className="block text-sm font-medium">
-              Camera view
-            </label>
-            <select
-              id="view-hint"
-              className="w-full rounded-md border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2"
+            <span className="block text-sm font-medium">Camera view</span>
+            <GlideSelect
+              className="w-full"
+              options={VIEW_OPTIONS}
               value={viewHint}
               disabled={uploadMutation.isPending}
-              onChange={(event) =>
-                setViewHint(event.target.value as ViewHint)
-              }
-            >
-              <option value="side">Side</option>
-              <option value="rear_three_quarter">Rear three-quarter</option>
-            </select>
+              ariaLabel="Camera view"
+              showTags
+              onChange={(next) => setViewHint(next as ViewHint)}
+              {...SELECT_THEME}
+            />
           </div>
         </div>
 

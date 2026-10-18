@@ -40,13 +40,13 @@ export function VideoDropzone({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="relative z-10 space-y-2">
       <label
         htmlFor={inputId}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed px-6 py-10 text-center transition-colors ${
+        className={`relative flex cursor-pointer flex-col items-center justify-center rounded-sm border-2 border-dashed px-6 py-10 text-center transition-colors ${
           dragging
             ? 'border-[var(--color-accent)] bg-[var(--color-accent-soft)]'
             : 'border-[var(--color-border)] bg-[var(--color-surface)] hover:border-[var(--color-accent)]'
